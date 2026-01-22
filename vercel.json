@@ -1,0 +1,11 @@
+{
+  "bunVersion": "1.x",
+  "buildCommand": "bun --bun next build",
+  "installCommand": "bun install",
+  "env": {
+    "DISCORD_CLIENT_ID": "@DISCORD_CLIENT_ID",
+    "DISCORD_CLIENT_SECRET": "@DISCORD_CLIENT_SECRET",
+    "DISCORD_REDIRECT_URI": "@DISCORD_REDIRECT_URI",
+    "JWT_SECRET": "@JWT_SECRET"
+  }
+}
