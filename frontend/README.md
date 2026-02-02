@@ -32,7 +32,16 @@ The frontend is organized into logical component domains to ensure lean pages an
 We follow a high-contrast, dark-mode aesthetic designed to wow users:
 -   **Aesthetic**: Neon gradients (Purple/Blue/Pink), glassmorphism, and subtle micro-animations.
 -   **Glow System**: Centralized `GlowBackground` component for consistent, themed page backgrounds.
--   **Accessibility**: High contrast ratios and clear loading/error feedback.
+- **Accessibility**: High contrast ratios and clear loading/error feedback.
+
+## ✨ Motion & Interactions
+
+We use **Framer Motion** to create a living, breathing interface that feels responsive and high-end:
+
+- **Centralized Variants**: All major animations (fades, slides, staggered child animations, and floating effects) are defined in `src/styles/animations.ts`. This ensures movement consistency across the entire app.
+- **Branded Loading**: Our custom `HoneycombSpinner` and `LoadingScreen` replace generic spinners with a geometric, hexagon-based animation that reinforces the BearHacks brand identity.
+- **Hardware Accelerated**: Animations prioritize `transform` and `opacity` properties with `will-change` optimizations to ensure 120FPS smoothness on high-refresh displays.
+- **Micro-interactions**: Hover states and layout transitions (using `layoutId`) provide tactile feedback for navigation and tab switching.
 
 ## 📄 Pages (Controllers)
 
