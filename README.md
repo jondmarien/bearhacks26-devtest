@@ -11,7 +11,7 @@ This project follows a **Modular Component Architecture**, designed for maximum 
     - `src/pages/`: Slim page controllers that orchestrate modular components.
     - `src/types/`: Centralized TypeScript definitions for reliable data flow.
 - **`backend/`**: Express API using Bun, Mongoose (MongoDB), and JWT Authentication.
-- **`shared/`**: Common validation logic and Zod schemas used to enforce parity between client and server.
+- **`shared/`**: Centralized Zod schemas and validation logic ensuring absolute parity for form data and API contracts between the client and server.
 
 ## ✨ Premium Features
 

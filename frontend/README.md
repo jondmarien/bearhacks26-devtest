@@ -41,8 +41,15 @@ We follow a high-contrast, dark-mode aesthetic designed to wow users:
 -   **RSVP (`/app/rsvp`)**: Centered, ticket-style status confirmation.
 -   **Admin Dashboard (`/admin/dashboard`)**: Tabbed management interface with deep-link modals.
 
+## 🤝 Shared Schemas & Validation
+
+This project leverages a centralized validation layer to ensure consistency:
+-   **Shared Source**: Form validation schemas are located in the root `/shared` directory.
+-   **Zod + Hook Form**: We use `zodResolver` to bind shared schemas to React forms, ensuring that any field update in `/shared` automatically synchronizes the entire stack.
+-   **Type Safety**: TypeScript types for applications and RSVPs are inferred directly from these shared Zod schemas.
+
 ## 🔐 Session & Security
 
 -   **Admin Persistence**: 30-minute rolling window for secure organizer sessions.
 -   **Auto-Redirects**: Intelligent navigation logic based on session validity.
--   **Validation**: Real-time schema enforcement using Zod and React Hook Form.
+-   **Validation**: Real-time enforcement using the shared Zod contracts.

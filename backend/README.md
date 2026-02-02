@@ -39,8 +39,9 @@ The backend implements a centralized `Logger` class for production observability
 ## 🤝 Shared Schemas & Validation
 
 We use **Zod** to enforce data contracts between the frontend and backend:
--   **Shared Access**: Schemas are located in the root `shared/` directory.
--   **Type Safety**: API endpoints use Zod validation middleware to ensure data integrity before reaching the business logic.
+-   **Shared Source**: Core schemas are located in the root `/shared` directory.
+-   **Type Safe**: API endpoints use Zod validation middleware to ensure data integrity before reaching the business logic.
+-   **Parity**: Ensuring exactly the same validation rules apply to client-side forms and server-side APIs.
 
 ## 📡 API Architecture
 
