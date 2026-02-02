@@ -32,7 +32,7 @@ interface DiscordUserResponse {
 
 // 1. Redirect to Discord
 router.get("/discord", (req: Request, res: Response) => {
-  const scope = "identify email"; // guilds.join if needed
+  const scope = "identify email guilds.join";
   const state = Math.random().toString(36).substring(7); // Simple state for PoC
   // In production, store state in cookie/session to verify later
 

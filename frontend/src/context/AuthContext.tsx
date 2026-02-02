@@ -27,16 +27,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const checkAuth = async () => {
     try {
+      console.log("Checking auth status...", `${API_URL}/auth/me`);
       const res = await axios.get(`${API_URL}/auth/me`, {
         withCredentials: true,
       });
+      console.log("Auth response:", res.data);
       if (res.data.authenticated) {
         setUser(res.data.user);
       } else {
         setUser(null);
       }
     } catch (error) {
-      console.error("Auth check failed", error);
+      console.error("Auth check failed full error:", error);
       setUser(null);
     } finally {
       setLoading(false);
