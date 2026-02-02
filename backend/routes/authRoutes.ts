@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User";
 import type { AuthRequest } from "../middleware/authMiddleware";
 import authMiddleware from "../middleware/authMiddleware";
+import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
@@ -95,6 +96,7 @@ router.get("/discord/callback", async (req: Request, res: Response) => {
     // Upsert User
     let user = await User.findOne({ discordId: userData.id });
     if (!user) {
+      console.log("Creating new user:", userData.username);
       user = await User.create({
         discordId: userData.id,
         username: userData.username,
@@ -103,6 +105,7 @@ router.get("/discord/callback", async (req: Request, res: Response) => {
         email: userData.email,
       });
     } else {
+      console.log("Updating existing user:", userData.username);
       // Update fields if changed
       user.username = userData.username;
       user.discriminator = userData.discriminator;
@@ -124,11 +127,55 @@ router.get("/discord/callback", async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
+    console.log("Auth successful for user:", userData.username);
+
     // Redirect to frontend app with Token in parameter (for Bearer auth fallback)
     res.redirect(`${process.env.FRONTEND_URL}/app/apply?token=${token}`);
   } catch (error) {
     console.error("Auth Error:", error);
     res.status(500).send("Internal Server Error");
+  }
+});
+
+// Admin Login
+router.post("/login", async (req: Request, res: Response) => {
+  const { username } = req.body;
+  console.log(`Attempting admin login for: ${username}`);
+
+  try {
+    const user = await User.findOne({ username }).select("+password");
+    if (!user || !user.password) {
+      console.warn(
+        `Admin login failed: User not found or no password set for ${username}`,
+      );
+      res.status(401).json({ message: "Invalid credentials" });
+      return;
+    }
+
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
+    if (!isMatch) {
+      console.warn(`Admin login failed: Invalid password for ${username}`);
+      res.status(401).json({ message: "Invalid credentials" });
+      return;
+    }
+
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    // Set cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none", // Critical for cross-site auth
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    console.log(`Admin login successful: ${username}`);
+    res.json({ token, user });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -147,6 +194,7 @@ router.get("/me", authMiddleware, async (req: AuthRequest, res: Response) => {
         discordId: user.discordId,
         username: user.username,
         avatar: user.avatar,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -155,6 +203,7 @@ router.get("/me", authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 router.get("/logout", (req: Request, res: Response) => {
+  console.log("User logging out");
   res.clearCookie("token");
   res.json({ success: true });
 });

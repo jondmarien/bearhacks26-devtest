@@ -25,6 +25,12 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+// Request Logger
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
 // Database Connection
 connectDB().then(() => {
   seedAdmin();

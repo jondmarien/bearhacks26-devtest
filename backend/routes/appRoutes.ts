@@ -38,12 +38,14 @@ router.post("/application/me", async (req: AuthRequest, res: Response) => {
     let application = await Application.findOne({ userId: req.userId });
 
     if (application) {
+      console.log(`Updating application for user ${req.userId}`);
       // Update
       application.basicInfo = basicInfo;
       application.skillsAndLinks = skillsAndLinks;
       application.accessibility = accessibility;
       await application.save();
     } else {
+      console.log(`Creating new application for user ${req.userId}`);
       // Create
       application = await Application.create({
         userId: req.userId,
@@ -95,20 +97,26 @@ router.post("/rsvp", async (req: AuthRequest, res: Response) => {
     const application = await Application.findOne({ userId: req.userId });
 
     if (!application) {
+      console.warn(`RSVP failed: No application for user ${req.userId}`);
       res.status(400).json({ message: "No application found" });
       return;
     }
 
     if (!application.accepted) {
+      console.warn(
+        `RSVP failed: Application not accepted for user ${req.userId}`,
+      );
       res.status(403).json({ message: "Application not accepted yet" });
       return;
     }
 
     if (application.rsvpd) {
+      console.log(`User ${req.userId} already RSVP'd`);
       res.json({ rsvpd: true }); // Idempotent
       return;
     }
 
+    console.log(`User ${req.userId} confirmed RSVP`);
     application.rsvpd = true;
     await application.save();
 
