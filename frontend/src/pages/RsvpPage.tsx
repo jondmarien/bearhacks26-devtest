@@ -31,7 +31,7 @@ const RsvpPage: React.FC = () => {
   const [adminApps, setAdminApps] = useState<AdminApp[]>([]);
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
 
-  const fetchRsvp = async (appId?: string) => {
+  const fetchRsvp = async () => {
     try {
       const token = localStorage.getItem("authToken");
 
