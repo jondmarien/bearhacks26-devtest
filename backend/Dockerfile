@@ -1,5 +1,5 @@
 # Use the official Bun image
-FROM oven/bun:1 as base
+FROM oven/bun:1 AS base
 WORKDIR /app
 
 # Copy shared directory (assumes build context is root of repo)
