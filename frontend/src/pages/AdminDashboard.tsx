@@ -7,6 +7,7 @@ import Logger from "@/utils/Logger";
 import type { Application, TestApplication } from "@/types/admin";
 import ApplicationReviewModal from "@/components/admin/ApplicationReviewModal";
 import ApplicationTable from "@/components/admin/ApplicationTable";
+import { motion } from "framer-motion";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -124,18 +125,40 @@ const AdminDashboard: React.FC = () => {
           <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-gray-400">
             Admin Dashboard
           </h1>
-          <div className="flex bg-gray-800 p-1 rounded-xl border border-gray-700">
+          <div className="flex bg-gray-800 p-1 rounded-xl border border-gray-700 relative">
             <button
               onClick={() => setActiveTab("hackers")}
-              className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === "hackers" ? "bg-purple-600 shadow-lg" : "hover:bg-gray-700 text-gray-400"}`}
+              className={`relative z-10 px-6 py-2 rounded-lg font-bold transition-colors duration-300 ${
+                activeTab === "hackers"
+                  ? "text-white"
+                  : "text-gray-400 hover:text-white"
+              }`}
             >
               Hacker Apps
+              {activeTab === "hackers" && (
+                <motion.div
+                  layoutId="activeTabSlot"
+                  className="absolute inset-0 bg-linear-to-br from-fuchsia-500 to-pink-600 rounded-lg shadow-[0_0_20px_rgba(219,39,119,0.4)] -z-10"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
             </button>
             <button
               onClick={() => setActiveTab("test")}
-              className={`px-6 py-2 rounded-lg font-bold transition-all ${activeTab === "test" ? "bg-purple-600 shadow-lg" : "hover:bg-gray-700 text-gray-400"}`}
+              className={`relative z-10 px-6 py-2 rounded-lg font-bold transition-colors duration-300 ${
+                activeTab === "test"
+                  ? "text-white"
+                  : "text-gray-400 hover:text-white"
+              }`}
             >
               Test Apps
+              {activeTab === "test" && (
+                <motion.div
+                  layoutId="activeTabSlot"
+                  className="absolute inset-0 bg-linear-to-br from-fuchsia-500 to-pink-600 rounded-lg shadow-[0_0_20px_rgba(219,39,119,0.4)] -z-10"
+                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                />
+              )}
             </button>
           </div>
         </div>
