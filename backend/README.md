@@ -1,16 +1,15 @@
-# BearHacks 2026 - Backend
+# 🐻 BearHacks 2026 - Backend
 
-The backend API for BearHacks 2026, built with Express and Bun.
+The robust backend API for BearHacks 2026, built with Express and Bun.
 
-## ⚙️ Setup
+## ⚙️ Development Setup
 
-1.  **Install Dependencies**
+1.  **Install Dependencies** (from root recommended)
     ```bash
-    bun install
+    bun run install:all
     ```
-
 2.  **Environment Variables**
-    Create a `.env` file in this directory:
+    Create `.env` in this directory:
     ```env
     PORT=5000
     MONGO_URI=mongodb+srv://...
@@ -25,32 +24,36 @@ The backend API for BearHacks 2026, built with Express and Bun.
     JWT_SECRET=your_super_secret_key
     NODE_ENV=development
     ```
-
-3.  **Run Development Server**
+3.  **Launch**
     ```bash
     bun run dev
     ```
 
-## 🔐 Admin Access
+## 📝 Logging Subsystem
 
-A default admin account is seeded automatically on startup if it doesn't exist.
+The backend implements a centralized `Logger` class for production observability:
+-   **Traceability**: Real-time logging of Method/URL/IP for every request.
+-   **Identity Correlation**: Logs Discord identity for hacker actions and administrative identity for dashboard actions.
+-   **Security Audits**: Automated logs for JWT issuance, session expiry events, and failed authentication attempts.
 
--   **Username**: `admin`
--   **Password**: `[PASSWORD]`
--   **Endpoint**: `POST /auth/login`
+## 🤝 Shared Schemas & Validation
 
-## 📡 API Endpoints
+We use **Zod** to enforce data contracts between the frontend and backend:
+-   **Shared Access**: Schemas are located in the root `shared/` directory.
+-   **Type Safety**: API endpoints use Zod validation middleware to ensure data integrity before reaching the business logic.
+
+## 📡 API Architecture
 
 ### Authentication (`/auth`)
 -   `GET /auth/discord`: Initiate Discord OAuth flow.
 -   `GET /auth/discord/callback`: OAuth callback (Cookies + Redirect).
 -   `POST /auth/login`: Admin password login.
--   `GET /auth/logout`: clear session.
+-   `GET /auth/logout`: Clear session.
 -   `GET /auth/me`: Check current session.
 
 ### Application (`/api/application`)
 -   `GET /me`: Get current user's application.
--   `POST /me`: Create or Update application.
+-   `POST /me`: Create or Update application (Validated by Zod).
 
 ### RSVP (`/api/rsvp`)
 -   `GET /me`: Get RSVP status (hasApplication, accepted, rsvpd).
@@ -61,27 +64,4 @@ A default admin account is seeded automatically on startup if it doesn't exist.
 -   `GET /my-apps`: List test applications created by the admin.
 -   `POST /application/:id/status`: Update hacker application status.
 -   `POST /test-application/:id/status`: Update test application status.
-
-The backend implements comprehensive logging using a centralized `Logger` class:
--   **Global**: All requests are logged with Method/URL/Timestamp.
--   **Levels**: Supports `info`, `success`, `warn`, `error`, and `debug` for precise troubleshooting.
--   **Auth**: Success/Failure logs for Discord and Admin login, including IP tracking.
--   **App/RSVP**: Logs for application submissions and RSVP confirmations.
--   **Admin**: Logs for fetching lists, updating applicant status, and test mode operations.
--   **Sessions**: Tracking for JWT issuance and session verification audits.
-
-## 🤝 Shared Schemas & Validation
-
-The backend now uses **Zod** for request validation, sharing schemas with the frontend to ensure consistency.
-
--   **Schema Location**: `../shared/schemas`
--   **Usage**: Imported via key `@shared/*`.
--   **Middleware**: Validates `POST /application/me` against `ApplicationSchema`.
-
-## 📦 Installation (Monorepo)
-
-To ensure shared dependencies are linked correctly:
-```bash
-# From root
-bun install:all
-```
+-   `GET /logs`: (Internal) Retrieve system logs.

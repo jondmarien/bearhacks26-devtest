@@ -1,55 +1,48 @@
-# BearHacks 2026 - Frontend
+# 🐻 BearHacks 2026 - Frontend
 
-The frontend user interface for BearHacks 2026, built with React, Vite, and TailwindCSS.
+The premium, modular frontend for BearHacks 2026. Built with React, Vite, and TailwindCSS v4.
 
-## ⚙️ Setup
+## ⚙️ Development Setup
 
-1.  **Install Dependencies**
+1.  **Install Dependencies** (from root recommended)
     ```bash
-    bun install
+    bun run install:all
     ```
-
 2.  **Environment Variables**
-    Create a `.env` file in this directory:
+    Create `.env` in this directory:
     ```env
     VITE_API_BASE_URL=http://localhost:5000
     ```
-
-3.  **Run Development Server**
+3.  **Launch**
     ```bash
     bun run dev
     ```
 
-## 📄 Pages
+## 🧩 Modular Component Architecture
 
--   **Landing (`/`)**: Main entry point. Login button.
--   **Application (`/app/apply`)**: Hacker application form. Auto-saves.
--   **RSVP (`/app/rsvp`)**: Status check and confirmation page.
--   **Admin Login (`/admin`)**: Password-based login for organizers.
--   **Admin Dashboard (`/admin/dashboard`)**: Tabbed interface to manage Hacker Applications and Test Applications separately.
--   **NotFound (`/404`)**: Themed 404 page for broken links.
--   **Error (`/error`)**: Themed error page for system failures.
+The frontend is organized into logical component domains to ensure lean pages and reusable logic:
 
-## 🎨 UI/UX Features
+-   **`src/components/admin/`**: Dashboard components, application tables, and review modals.
+-   **`src/components/application/`**: Modular form sections (`BasicInfo`, `Skills`, `Accessibility`), error modals, and admin-only test lists.
+-   **`src/components/rsvp/`**: Interactive RSVP status cards and admin app selectors.
+-   **`src/components/layout/`**: Shared UI elements like `Navbar` and the `GlowBackground` system.
 
--   **Deep Navigation**: Persistent Navbar on inner pages.
--   **Admin Session Persistence**: 30-minute auto-redirect and secure timeout for organizers.
--   **Responsive Design**: Mobile-first layout using TailwindCSS.
--   **Feedback**: Loading states, custom Logger integration, and conditional rendering (e.g., "Under Review" vs "Accepted").
--   **Auth Integration**: Handles HTTP-Only cookies calling the backend.
+## 🎨 Design System: "BearHacks Premium"
 
-## 🤝 Shared Schemas & Forms
+We follow a high-contrast, dark-mode aesthetic designed to wow users:
+-   **Aesthetic**: Neon gradients (Purple/Blue/Pink), glassmorphism, and subtle micro-animations.
+-   **Glow System**: Centralized `GlowBackground` component for consistent, themed page backgrounds.
+-   **Accessibility**: High contrast ratios and clear loading/error feedback.
 
-The frontend uses **React Hook Form** combined with **Zod** for robust form handling.
+## 📄 Pages (Controllers)
 
--   **Schema Location**: `../../shared/schemas` (aliased as `@shared`).
--   **Form Logic**: `ApplicationPage` uses `useForm` with `zodResolver`.
--   **Validation**: Real-time error messages for required fields and formats.
+-   **Landing (`/`)**: High-impact hero section with primary Call-to-Action.
+-   **Application (`/app/apply`)**: Fragmented form orchestrator with auto-save capabilities.
+-   **RSVP (`/app/rsvp`)**: Centered, ticket-style status confirmation.
+-   **Admin Dashboard (`/admin/dashboard`)**: Tabbed management interface with deep-link modals.
 
-## 📦 Installation (Monorepo)
+## 🔐 Session & Security
 
-To ensure shared dependencies are linked correctly:
-```bash
-# From root
-bun install:all
-```
+-   **Admin Persistence**: 30-minute rolling window for secure organizer sessions.
+-   **Auto-Redirects**: Intelligent navigation logic based on session validity.
+-   **Validation**: Real-time schema enforcement using Zod and React Hook Form.

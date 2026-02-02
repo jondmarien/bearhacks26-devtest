@@ -1,26 +1,45 @@
-# BearHacks 2026 PoC
+# 🐻 BearHacks 2026
 
-This repository contains the Proof of Concept (PoC) for the BearHacks 2026 application system. It is structured as a monorepo containing a separate Frontend (Vite + React) and Backend (Express + Bun).
+The official hacker application and management system for BearHacks 2026. This project is a production-ready monorepo featuring a premium user experience, robust validation, and modular architecture.
 
-## 🏗️ Structure
+## 🏗️ Architecture & Philosophy
 
-- **`frontend/`**: React application using Vite, TypeScript, and TailwindCSS.
+This project follows a **Modular Component Architecture**, designed for maximum maintainability and separation of concerns.
+
+- **`frontend/`**: React application using Vite, TypeScript, and TailwindCSS v4.
+    - `src/components/`: Modular, reusable components organized by feature (admin, application, rsvp, layout).
+    - `src/pages/`: Slim page controllers that orchestrate modular components.
+    - `src/types/`: Centralized TypeScript definitions for reliable data flow.
 - **`backend/`**: Express API using Bun, Mongoose (MongoDB), and JWT Authentication.
+- **`shared/`**: Common validation logic and Zod schemas used to enforce parity between client and server.
+
+## ✨ Premium Features
+
+- **Branding & Identity**: Custom geometric bear logo and neon-glow aesthetic (Purple/Blue/Pink).
+- **Discord Authentication**: Secure OAuth2 login with session synchronization.
+- **Modular Application Flow**: Multi-segment form with real-time validation and localized state.
+- **RSVP Portal**: Interactive status tracking with custom ticket aesthetics for confirmed hackers.
+- **Admin Dashboard**: Advanced review system with tabbed management and detailed review modals.
+    - **Test Mode**: Dedicated sandbox for admins to submit and review test entries without cluttering real data.
+    - **Session Security**: 30-minute rolling session expiry with automated redirect logic.
+
+## 🛠️ Technology Stack
+
+- **Runtime**: [Bun](https://bun.sh) (High-performance JS runtime)
+- **Frontend**: React 19, Vite, TailwindCSS v4, Framer Motion (animations)
+- **Backend**: Express.js, MongoDB Atlas (Mongoose)
+- **Validation**: Zod (Shared Schemas) + React Hook Form
+- **Logging**: Centralized `Logger` subsystem with IP traceability.
 
 ## 🚀 Quick Start
 
-To run both the frontend and backend concurrently (requires Bun):
+To run the entire stack concurrently (requires Bun):
 
 ```bash
-# Install dependencies for both (via root script)
-bun run install:all
+# Install dependencies for the monorepo
+bun install:all
 
-# OR manually
-cd backend && bun install
-cd ../frontend && bun install
-cd ..
-
-# Run both in parallel
+# Launch Backend & Frontend in parallel
 bun run dev
 ```
 
@@ -29,45 +48,5 @@ bun run dev
 
 ## 🌐 Deployments
 
-- **Frontend (Vercel)**: https://bearhacks26-devtest.vercel.app
-- **Backend (Render)**: https://bearhacks26-devtest.onrender.com
-
-## ✨ Features
-
-- **Discord Authentication**: Secure OAuth2 login with HTTP-Only cookies.
-- **Hacker Application**: Multi-step form with auto-save/update.
-- **RSVP System**: Status tracking (Pending -> Accepted -> Confirmed).
-- **Shared Schema**: Common validation logic in `shared/` ensuring frontend/backend parity.
-- **Admin Panel**: Dashboard for organizers to review and accept applications.
-    - **Login**: `/admin`
-    - **Default User**: `admin`
-    - **Default Pass**: `[PASSWORD]`
-    - **Session Persistence**: 30-minute auto-redirect logic for organizers.
-    - **Test Mode**: Separate tab/collection for "Test Applications" to safely iterate without affecting hacker data.
-- **Validation**:
-    - **Zod**: Type-safe schema validation for both frontend forms and backend APIs.
-    - **React Hook Form**: Performance-focused form state management.
-- **Logging**: Comprehensive system-wide logging using a custom `Logger` class.
-    - **Traceability**: IP tracking and Discord identity correlation for all actions.
-    - **Session Monitoring**: Automated logging for session timeouts and auto-redirects.
-
-## 🛠️ Technology Stack
-
-- **Runtime**: Bun (Fast JavaScript runtime)
-- **Frontend**: React, Vite, TailwindCSS v4
-- **Backend**: Express.js, MongoDB Atlas (Mongoose)
-- **Validation**: Zod + React Hook Form
-- **Security**: `bcryptjs`, `jsonwebtoken`, `cors` (SameSite=None)
-
-## 📦 Installation & Setup
-
-We use **Bun** for package management. Since we use a `shared/` directory, you must generally install dependencies from the root to ensure proper linking, or verify `bun install` works in subdirectories.
-
-```bash
-# Install all dependencies (Backend + Frontend)
-bun install:all
-
-# OR manually:
-cd backend && bun install
-cd ../frontend && bun install
-```
+- **Frontend**: [BearHacks 2026](https://bhacks26.chron0.tech)
+- **Backend**: [BearHacks 2026 API](https://bearhacks26-devtest.onrender.com)
