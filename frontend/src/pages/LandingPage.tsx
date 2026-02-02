@@ -61,18 +61,43 @@ const LandingPage: React.FC = () => {
           <StaggerItem className="pt-8">
             {user ? (
               <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-                <button
-                  onClick={() => navigate("/app/apply")}
-                  className="w-full md:w-auto px-10 py-5 bg-linear-to-r from-purple-600 to-blue-600 rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl border border-white/10"
-                >
-                  Dashboard
-                </button>
-                <button
-                  onClick={() => navigate("/app/rsvp")}
-                  className="w-full md:w-auto px-10 py-5 bg-gray-800 border-2 border-gray-700 rounded-2xl font-black text-xl transition-all hover:scale-105 active:scale-95 shadow-xl"
-                >
-                  Check RSVP
-                </button>
+                {user.role === "admin" ? (
+                  <>
+                    <button
+                      onClick={() => navigate("/admin/dashboard")}
+                      className="w-full md:w-auto px-10 py-5 bg-linear-to-r from-purple-600 to-blue-600 rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl border border-white/10"
+                    >
+                      Dashboard
+                    </button>
+                    <button
+                      onClick={() => navigate("/app/apply")}
+                      className="w-full md:w-auto px-10 py-5 bg-gray-800 border-2 border-gray-700/50 rounded-2xl font-black text-xl transition-all hover:scale-105 active:scale-95 shadow-xl hover:border-purple-500/50 hover:text-purple-400"
+                    >
+                      Make Test App
+                    </button>
+                    <button
+                      onClick={() => navigate("/app/rsvp")}
+                      className="w-full md:w-auto px-10 py-5 bg-gray-800 border-2 border-gray-700 rounded-2xl font-black text-xl transition-all hover:scale-105 active:scale-95 shadow-xl"
+                    >
+                      Check RSVP
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => navigate("/app/apply")}
+                      className="w-full md:w-auto px-10 py-5 bg-linear-to-r from-purple-600 to-blue-600 rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl border border-white/10"
+                    >
+                      Dashboard
+                    </button>
+                    <button
+                      onClick={() => navigate("/app/rsvp")}
+                      className="w-full md:w-auto px-10 py-5 bg-gray-800 border-2 border-gray-700 rounded-2xl font-black text-xl transition-all hover:scale-105 active:scale-95 shadow-xl"
+                    >
+                      Check RSVP
+                    </button>
+                  </>
+                )}
               </div>
             ) : (
               <button
