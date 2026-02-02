@@ -43,18 +43,20 @@ connectDB().then(() => {
 // Serve Frontend Static Files
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
+// API Routes (Must come before SPA catch-all)
+app.use("/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api", appRoutes);
+
 // Catch-all for SPA
-app.get("*", (req, res) => {
+// Express 5 requires regex for global wildcard
+app.get(/.*/, (req, res) => {
   if (req.path.startsWith("/api") || req.path.startsWith("/auth")) {
     res.status(404).json({ message: "API endpoint not found" });
     return;
   }
   res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
 });
-
-app.use("/auth", authRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api", appRoutes);
 
 app.listen(PORT, () => {
   Logger.info(`Server running on port ${PORT}`);
