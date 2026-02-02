@@ -12,18 +12,13 @@ const AdminDashboard = lazy(() => import("@/pages/AdminDashboard"));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
 const ErrorPage = lazy(() => import("@/pages/ErrorPage"));
 
-// Loading fallback
-const LoadingScreen = () => (
-  <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-  </div>
-);
+import LoadingScreen from "@/components/layout/LoadingScreen";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Suspense fallback={<LoadingScreen />}>
+        <Suspense fallback={<LoadingScreen message="Waking up the bears..." />}>
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/admin" element={<AdminLoginPage />} />

@@ -1,3 +1,4 @@
+import LoadingScreen from "@/components/layout/LoadingScreen";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Logger from "@/utils/Logger";
@@ -112,7 +113,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     <AuthContext.Provider
       value={{ user, loading, login, loginWithPassword, logout }}
     >
-      {children}
+      {loading ? <LoadingScreen message="Verifying Identity..." /> : children}
     </AuthContext.Provider>
   );
 };

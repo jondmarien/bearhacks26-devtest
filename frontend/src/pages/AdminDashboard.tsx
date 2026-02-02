@@ -7,6 +7,7 @@ import Logger from "@/utils/Logger";
 import type { Application, TestApplication } from "@/types/admin";
 import ApplicationReviewModal from "@/components/admin/ApplicationReviewModal";
 import ApplicationTable from "@/components/admin/ApplicationTable";
+import LoadingScreen from "@/components/layout/LoadingScreen";
 import { motion } from "framer-motion";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
@@ -109,12 +110,7 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
-  if (authLoading)
-    return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+  if (authLoading) return <LoadingScreen message="Checking Credentials..." />;
   if (!user || user.role !== "admin") return <Navigate to="/admin" replace />;
 
   return (
@@ -164,11 +160,8 @@ const AdminDashboard: React.FC = () => {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center p-20 gap-4">
-            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-gray-400 animate-pulse font-medium">
-              Loading Database...
-            </p>
+          <div className="flex flex-col items-center justify-center p-20">
+            <LoadingScreen message="Accessing Database..." />
           </div>
         ) : (
           <ApplicationTable

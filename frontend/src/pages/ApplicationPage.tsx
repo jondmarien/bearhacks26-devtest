@@ -12,6 +12,7 @@ import {
 } from "@shared/schemas/application";
 import SubmissionErrorModal from "@/components/application/SubmissionErrorModal";
 import AdminTestAppsList from "@/components/application/AdminTestAppsList";
+import LoadingScreen from "@/components/layout/LoadingScreen";
 import {
   BasicInfoSection,
   SkillsLinksSection,
@@ -120,19 +121,9 @@ const ApplicationPage: React.FC = () => {
     fetchApplication();
   }, [user, reset]);
 
-  if (authLoading)
-    return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        Loading Auth...
-      </div>
-    );
+  if (authLoading) return <LoadingScreen message="Checking Credentials..." />;
   if (!user) return <Navigate to="/" replace />;
-  if (loading)
-    return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        Loading Application...
-      </div>
-    );
+  if (loading) return <LoadingScreen message="Fetching Application..." />;
 
   const onFormSubmit = async (data: ApplicationData) => {
     setSubmitError(null);

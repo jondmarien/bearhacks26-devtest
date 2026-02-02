@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Logger from "@/utils/Logger";
 import AdminAppSelector from "@/components/rsvp/AdminAppSelector";
 import RsvpStatusCard from "@/components/rsvp/RsvpStatusCard";
+import LoadingScreen from "@/components/layout/LoadingScreen";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -100,23 +101,10 @@ const RsvpPage: React.FC = () => {
     }
   };
 
-  if (authLoading)
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+  if (authLoading) return <LoadingScreen message="Checking Credentials..." />;
   if (!user) return <Navigate to="/" replace />;
 
-  if (loading)
-    return (
-      <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center gap-4">
-        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-gray-400 font-bold animate-pulse">
-          Checking Eligibility...
-        </p>
-      </div>
-    );
+  if (loading) return <LoadingScreen message="Checking Eligibility..." />;
 
   const currentApp =
     user.role === "admin"
