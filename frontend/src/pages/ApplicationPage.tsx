@@ -32,6 +32,8 @@ const STEPS = [
   "Review",
 ];
 
+const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
 const ApplicationPage = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -69,12 +71,13 @@ const ApplicationPage = () => {
       if (!user) return;
       try {
         const token = localStorage.getItem("authToken");
-        const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/application/me`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const response = await axios.get(`${API_URL}/api/application/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (typeof response.data === "string") {
+          throw new Error("Received HTML instead of JSON. Check API URL.");
+        }
 
         if (response.data) {
           reset(response.data);
@@ -94,7 +97,7 @@ const ApplicationPage = () => {
     setSubmitting(true);
     try {
       const token = localStorage.getItem("authToken");
-      await axios.post(`${import.meta.env.VITE_API_URL}/application`, data, {
+      await axios.post(`${API_URL}/api/application`, data, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/dashboard");
