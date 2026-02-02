@@ -29,7 +29,8 @@
     // Path Aliases
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@shared/*": ["../shared/*"]
     }
   }
 }

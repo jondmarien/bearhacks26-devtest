@@ -34,3 +34,19 @@ The frontend user interface for BearHacks 2026, built with React, Vite, and Tail
 -   **Responsive Design**: Mobile-first layout using TailwindCSS.
 -   **Feedback**: Loading states and conditional rendering (e.g., "Under Review" vs "Accepted").
 -   **Auth Integration**: Handles HTTP-Only cookies calling the backend.
+
+## 🤝 Shared Schemas & Forms
+
+The frontend uses **React Hook Form** combined with **Zod** for robust form handling.
+
+-   **Schema Location**: `../../shared/schemas` (aliased as `@shared`).
+-   **Form Logic**: `ApplicationPage` uses `useForm` with `zodResolver`.
+-   **Validation**: Real-time error messages for required fields and formats.
+
+## 📦 Installation (Monorepo)
+
+To ensure shared dependencies are linked correctly:
+```bash
+# From root
+bun install:all
+```

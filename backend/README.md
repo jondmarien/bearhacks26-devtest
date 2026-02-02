@@ -67,3 +67,19 @@ The backend implements comprehensive logging:
 -   **Auth**: Success/Failure logs for Discord and Admin login.
 -   **App/RSVP**: Logs for application submissions and RSVP confirmations.
 -   **Admin**: Logs for fetching lists and updating applicant status.
+
+## 🤝 Shared Schemas & Validation
+
+The backend now uses **Zod** for request validation, sharing schemas with the frontend to ensure consistency.
+
+-   **Schema Location**: `../shared/schemas`
+-   **Usage**: Imported via key `@shared/*`.
+-   **Middleware**: Validates `POST /application/me` against `ApplicationSchema`.
+
+## 📦 Installation (Monorepo)
+
+To ensure shared dependencies are linked correctly:
+```bash
+# From root
+bun install:all
+```

@@ -29,20 +29,25 @@ router.get("/application/me", async (req: AuthRequest, res: Response) => {
 // POST /api/application/me
 router.post("/application/me", async (req: AuthRequest, res: Response) => {
   try {
-    const { basicInfo, skillsAndLinks, accessibility } = req.body;
+    // Validate with Zod
+    const { ApplicationSchema } = require("@shared/schemas/application");
+    const validationResult = ApplicationSchema.safeParse(req.body);
 
-    // Basic validation
-    if (!basicInfo || !basicInfo.fullName) {
-      res.status(400).json({ message: "Full Name is required" });
+    if (!validationResult.success) {
+      Logger.warn(
+        "Validation failed for application submission",
+        validationResult.error.format(),
+      );
+      res.status(400).json({
+        message: "Validation Error",
+        errors: validationResult.error.flatten().fieldErrors,
+      });
       return;
     }
 
+    const { basicInfo, skillsAndLinks, accessibility } = validationResult.data;
+
     // CHECK IF ADMIN
-    // We need to fetch the user's role. req.userId is just the ID.
-    // However, authMiddleware might have attached user? No, just userId.
-    // We can check the DB or maybe update authMiddleware to pass role.
-    // For now, let's look up user since we need to know.
-    // Actually, let's import User model to check role.
     const User = require("@/models/User").default;
     const user = await User.findById(req.userId);
 
@@ -99,11 +104,7 @@ router.get("/rsvp/me", async (req: AuthRequest, res: Response) => {
     // Normal user check
     const application = await Application.findOne({ userId: req.userId });
 
-    // Note: Admins will see "No application" here unless we also check AdminApplication.
-    // But for the main RSVP page, admins might want to see their specific test apps status.
-    // Let's keep this simple for now: this route is for the standard single-user flow.
-    // Admins will use the dashboard to see their test apps.
-
+    // ! Note: Admins will see "No application" here unless we also check AdminApplication.
     if (!application) {
       res.json({
         hasApplication: false,
