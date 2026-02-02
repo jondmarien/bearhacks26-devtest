@@ -27,7 +27,10 @@ app.use(cookieParser());
 
 // Request Logger
 app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  const ip = req.headers["x-forwarded-for"] || req.ip;
+  console.log(
+    `[${new Date().toISOString()}] ${req.method} ${req.url} - IP: ${ip}`,
+  );
   next();
 });
 
