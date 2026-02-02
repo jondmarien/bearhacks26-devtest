@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import GlowBackground from "@/components/layout/GlowBackground";
 
 const ErrorPage: React.FC = () => {
   const navigate = useNavigate();
@@ -8,14 +9,12 @@ const ErrorPage: React.FC = () => {
   const error = location.state?.error || "An unexpected error occurred.";
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col relative overflow-hidden font-primary">
       <Navbar />
-
-      {/* Background Glows */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-[120px] -z-10 animate-pulse" />
+      <GlowBackground color="red" position="top" />
 
       <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
-        <div className="p-4 bg-red-500/10 rounded-full mb-6 border border-red-500/20">
+        <div className="p-5 bg-red-500/10 rounded-full mb-6 border border-red-500/20 shadow-2xl">
           <svg
             className="w-12 h-12 text-red-500"
             fill="none"
@@ -31,28 +30,28 @@ const ErrorPage: React.FC = () => {
           </svg>
         </div>
 
-        <h1 className="text-3xl font-bold mb-4">Something Went Wrong</h1>
-        <p className="text-gray-400 max-w-md mb-8">
+        <h1 className="text-4xl font-black mb-4">Something Went Wrong</h1>
+        <p className="text-gray-400 max-w-md mb-8 font-medium">
           We encountered a critical error while processing your request. Our
           bears are looking into it.
         </p>
 
-        <div className="bg-black/40 border border-gray-700 rounded-xl p-6 text-left max-w-2xl w-full mb-8">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              Error Report
+        <div className="bg-black/40 border border-gray-700/50 backdrop-blur-md rounded-2xl p-6 text-left max-w-2xl w-full mb-10 shadow-2xl overflow-hidden ring-1 ring-white/5">
+          <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-800">
+            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+              Technical Error Report
             </span>
             <button
               onClick={() => {
                 navigator.clipboard.writeText(JSON.stringify(error, null, 2));
                 alert("Copied to clipboard!");
               }}
-              className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
+              className="text-xs font-bold text-purple-400 hover:text-purple-300 transition-colors bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20"
             >
               Copy Details
             </button>
           </div>
-          <pre className="text-sm font-mono text-gray-300 overflow-x-auto whitespace-pre-wrap custom-scrollbar max-h-40">
+          <pre className="text-xs font-mono text-red-300/80 overflow-x-auto whitespace-pre-wrap custom-scrollbar max-h-48 leading-relaxed">
             {typeof error === "string" ? error : JSON.stringify(error, null, 2)}
           </pre>
         </div>
@@ -60,7 +59,7 @@ const ErrorPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           <button
             onClick={() => window.location.reload()}
-            className="px-8 py-3 bg-linear-to-r from-purple-600 to-blue-600 text-white font-bold rounded-full hover:brightness-110 transition-all shadow-xl hover:scale-105 active:scale-95 flex items-center gap-2"
+            className="px-8 py-3 bg-linear-to-r from-purple-600 to-blue-600 text-white font-black rounded-full hover:brightness-110 transition-all shadow-xl hover:scale-105 active:scale-95 flex items-center gap-2 border border-white/10"
           >
             <svg
               className="w-5 h-5"
@@ -79,7 +78,7 @@ const ErrorPage: React.FC = () => {
           </button>
           <button
             onClick={() => navigate("/")}
-            className="px-8 py-3 bg-gray-800 text-white font-bold rounded-full border border-gray-700 hover:bg-gray-700 transition-all shadow-xl hover:scale-105 active:scale-95"
+            className="px-8 py-3 bg-gray-800 text-white font-black rounded-full border border-gray-700 hover:bg-gray-700 transition-all shadow-xl hover:scale-105 active:scale-95"
           >
             Return Home
           </button>

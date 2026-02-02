@@ -4,6 +4,8 @@ import { useAuth } from "@/context/AuthContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Logger from "@/utils/Logger";
+import AdminAppSelector from "@/components/rsvp/AdminAppSelector";
+import RsvpStatusCard from "@/components/rsvp/RsvpStatusCard";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -31,29 +33,6 @@ const RsvpPage: React.FC = () => {
   const [adminApps, setAdminApps] = useState<AdminApp[]>([]);
   const [selectedAppId, setSelectedAppId] = useState<string | null>(null);
 
-  const fetchRsvp = async () => {
-    try {
-      const token = localStorage.getItem("authToken");
-
-      if (user?.role === "admin") {
-        // If admin, we already have apps list below, but we need to refresh list to see RSVP status
-        // OR we just use fetchAdminApps to refresh everything.
-        // Let's just re-fetch list.
-        await fetchAdminApps();
-      } else {
-        const res = await axios.get(`${API_URL}/api/rsvp/me`, {
-          withCredentials: true,
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        setStatus(res.data);
-      }
-    } catch (err) {
-      Logger.error("Failed to load RSVP status", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const fetchAdminApps = async () => {
     try {
       const token = localStorage.getItem("authToken");
@@ -66,6 +45,26 @@ const RsvpPage: React.FC = () => {
       }
     } catch (err) {
       Logger.error("Failed to load admin apps", err);
+    }
+  };
+
+  const fetchRsvp = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+
+      if (user?.role === "admin") {
+        await fetchAdminApps();
+      } else {
+        const res = await axios.get(`${API_URL}/api/rsvp/me`, {
+          withCredentials: true,
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        setStatus(res.data);
+      }
+    } catch (err) {
+      Logger.error("Failed to load RSVP status", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,7 +89,7 @@ const RsvpPage: React.FC = () => {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         },
       );
-      // Refresh status
+
       if (user?.role === "admin") {
         await fetchAdminApps();
       } else {
@@ -101,12 +100,24 @@ const RsvpPage: React.FC = () => {
     }
   };
 
-  if (authLoading) return <div>Loading...</div>;
+  if (authLoading)
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
   if (!user) return <Navigate to="/" replace />;
-  if (loading)
-    return <div className="p-8 text-white">Checking Eligibility...</div>;
 
-  // DERIVE STATUS FOR ADMIN FROM SELECTED APP
+  if (loading)
+    return (
+      <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center gap-4">
+        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-gray-400 font-bold animate-pulse">
+          Checking Eligibility...
+        </p>
+      </div>
+    );
+
   const currentApp =
     user.role === "admin"
       ? adminApps.find((a) => a._id === selectedAppId)
@@ -121,17 +132,19 @@ const RsvpPage: React.FC = () => {
         }
       : status;
 
-  // If admin has no apps, show empty state
   if (user.role === "admin" && adminApps.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white flex flex-col relative">
+      <div className="min-h-screen bg-gray-900 text-white flex flex-col relative font-primary">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center pt-24">
           <div className="bg-gray-800 p-10 rounded-2xl shadow-2xl max-w-md w-full border border-gray-700">
-            <h2 className="text-xl mb-4">No Test Applications</h2>
+            <h2 className="text-xl font-bold mb-4">No Test Applications</h2>
+            <p className="text-gray-400 mb-6 font-medium">
+              You need an application to test the RSVP flow.
+            </p>
             <button
               onClick={() => navigate("/app/apply")}
-              className="text-blue-400 font-bold"
+              className="px-6 py-2 bg-purple-600 rounded-xl font-bold hover:bg-purple-500 transition-all shadow-lg"
             >
               Create One &rarr;
             </button>
@@ -142,85 +155,18 @@ const RsvpPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col relative">
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col relative font-primary">
       <Navbar />
-      <div className="flex-1 flex flex-col items-center justify-center p-6 text-center pt-24">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 pt-24">
         {user.role === "admin" && (
-          <div className="mb-8 w-full max-w-md bg-gray-800 p-4 rounded-xl border border-gray-700">
-            <label className="block text-sm font-bold text-gray-400 mb-2">
-              Select Test Application
-            </label>
-            <select
-              className="w-full bg-gray-700 p-2 rounded text-white outline-none border border-gray-600"
-              value={selectedAppId || ""}
-              onChange={(e) => setSelectedAppId(e.target.value)}
-            >
-              {adminApps.map((app) => (
-                <option key={app._id} value={app._id}>
-                  {app.basicInfo.fullName} -{" "}
-                  {new Date(app.createdAt).toLocaleTimeString()}
-                </option>
-              ))}
-            </select>
-          </div>
+          <AdminAppSelector
+            apps={adminApps}
+            selectedId={selectedAppId}
+            onSelect={setSelectedAppId}
+          />
         )}
 
-        <div className="bg-gray-800 p-10 rounded-2xl shadow-2xl max-w-md w-full border border-gray-700">
-          <h1 className="text-3xl font-bold mb-6">RSVP Status</h1>
-
-          {!effectiveStatus.hasApplication && (
-            <div className="space-y-4">
-              <p className="text-gray-400">You haven't applied yet!</p>
-              <button
-                onClick={() => navigate("/app/apply")}
-                className="px-6 py-2 bg-blue-600 rounded-lg font-semibold hover:bg-blue-500 w-full"
-              >
-                Go to Application
-              </button>
-            </div>
-          )}
-
-          {effectiveStatus.hasApplication && !effectiveStatus.accepted && (
-            <div className="p-4 bg-yellow-900/30 border border-yellow-700 rounded-lg text-yellow-200">
-              Are you ready? Your application is <strong>under review</strong>.{" "}
-              <br />
-              We will email you once a decision has been made!
-            </div>
-          )}
-
-          {effectiveStatus.hasApplication &&
-            effectiveStatus.accepted &&
-            !effectiveStatus.rsvpd && (
-              <div className="space-y-4">
-                <div className="p-4 bg-green-900/30 border border-green-700 rounded-lg text-green-200 mb-6">
-                  Congratulations! You've been accepted to BearHacks 2026! 🎉
-                </div>
-                <button
-                  onClick={handleRsvp}
-                  className="w-full py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold text-white shadow-lg animate-pulse"
-                >
-                  CONFIRM MY ATTENDANCE
-                </button>
-              </div>
-            )}
-
-          {effectiveStatus.rsvpd && (
-            <div className="space-y-6">
-              <div className="text-6xl">🎟️</div>
-              <h2 className="text-2xl font-bold text-green-400">
-                You are going!
-              </h2>
-              <p className="text-gray-300">
-                Your spot is confirmed. We can't wait to see you there!
-              </p>
-              <div className="pt-4 border-t border-gray-700">
-                <p className="text-sm text-gray-500">
-                  Check your email for further instructions.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
+        <RsvpStatusCard status={effectiveStatus} onRsvp={handleRsvp} />
       </div>
     </div>
   );
