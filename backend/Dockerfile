@@ -5,10 +5,22 @@ WORKDIR /app
 # Copy shared directory (assumes build context is root of repo)
 COPY shared /shared
 
+# --- Build Frontend ---
+# Copy frontend source
+COPY frontend /frontend
+WORKDIR /frontend
+
+# Install frontend dependencies and build
+RUN bun install
+RUN bun run build
+
+# --- Setup Backend ---
+WORKDIR /app
+
 # Copy backend package files
 COPY backend/package.json backend/bun.lock ./
 
-# Install dependencies
+# Install backend dependencies
 RUN bun install --production
 
 # Copy backend source code
