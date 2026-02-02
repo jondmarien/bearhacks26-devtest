@@ -57,16 +57,18 @@ A default admin account is seeded automatically on startup if it doesn't exist.
 -   `POST /`: Confirm RSVP (only if accepted).
 
 ### Admin (`/api/admin`) - *Protected*
--   `GET /applications`: List all applications with user info.
--   `POST /application/:id/status`: Update status (`accepted` | `rejected`).
+-   `GET /applications`: List all hacker applications.
+-   `GET /my-apps`: List test applications created by the admin.
+-   `POST /application/:id/status`: Update hacker application status.
+-   `POST /test-application/:id/status`: Update test application status.
 
-## 📝 Logging
-
-The backend implements comprehensive logging:
+The backend implements comprehensive logging using a centralized `Logger` class:
 -   **Global**: All requests are logged with Method/URL/Timestamp.
--   **Auth**: Success/Failure logs for Discord and Admin login.
+-   **Levels**: Supports `info`, `success`, `warn`, `error`, and `debug` for precise troubleshooting.
+-   **Auth**: Success/Failure logs for Discord and Admin login, including IP tracking.
 -   **App/RSVP**: Logs for application submissions and RSVP confirmations.
--   **Admin**: Logs for fetching lists and updating applicant status.
+-   **Admin**: Logs for fetching lists, updating applicant status, and test mode operations.
+-   **Sessions**: Tracking for JWT issuance and session verification audits.
 
 ## 🤝 Shared Schemas & Validation
 

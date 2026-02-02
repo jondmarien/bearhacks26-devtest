@@ -42,10 +42,14 @@ bun run dev
     - **Login**: `/admin`
     - **Default User**: `admin`
     - **Default Pass**: `[PASSWORD]`
+    - **Session Persistence**: 30-minute auto-redirect logic for organizers.
+    - **Test Mode**: Separate tab/collection for "Test Applications" to safely iterate without affecting hacker data.
 - **Validation**:
     - **Zod**: Type-safe schema validation for both frontend forms and backend APIs.
     - **React Hook Form**: Performance-focused form state management.
-- **Logging**: Comprehensive logging for all requests and critical actions.
+- **Logging**: Comprehensive system-wide logging using a custom `Logger` class.
+    - **Traceability**: IP tracking and Discord identity correlation for all actions.
+    - **Session Monitoring**: Automated logging for session timeouts and auto-redirects.
 
 ## 🛠️ Technology Stack
 
