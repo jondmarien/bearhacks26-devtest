@@ -11,6 +11,21 @@ const router = express.Router();
 router.use(authMiddleware);
 router.use(adminMiddleware);
 
+import AdminApplication from "@/models/AdminApplication";
+
+// Get my test applications
+router.get("/my-apps", async (req: AuthRequest, res: Response) => {
+  try {
+    const apps = await AdminApplication.find({ userId: req.userId }).sort({
+      createdAt: -1,
+    });
+    res.json(apps);
+  } catch (error) {
+    Logger.error("Error fetching admin apps:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // Get all applications
 router.get("/applications", async (req: Request, res: Response) => {
   try {

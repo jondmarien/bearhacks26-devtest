@@ -7,10 +7,19 @@ import Logger from "@/utils/Logger";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
+interface AdminApp {
+  _id: string;
+  basicInfo: { fullName: string };
+  accepted: boolean;
+  rsvpd: boolean;
+  createdAt: string;
+}
+
 const ApplicationPage: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [adminApps, setAdminApps] = useState<AdminApp[]>([]);
   const [formData, setFormData] = useState({
     basicInfo: { fullName: "", email: "", school: "", year: "", location: "" },
     skillsAndLinks: { skills: "", githubUrl: "", portfolioUrl: "" },
@@ -21,36 +30,63 @@ const ApplicationPage: React.FC = () => {
     },
   });
 
+  // Reset form helper
+  const resetForm = () => {
+    setFormData({
+      basicInfo: {
+        fullName: user?.username || "",
+        email: "",
+        school: "",
+        year: "",
+        location: "",
+      },
+      skillsAndLinks: { skills: "", githubUrl: "", portfolioUrl: "" },
+      accessibility: {
+        allergies: "",
+        dietaryRestrictions: "",
+        accommodations: "",
+      },
+    });
+  };
+
   useEffect(() => {
     if (!user) return;
 
     const fetchApplication = async () => {
       try {
-        const token = localStorage.getItem("authToken"); // Get token
-        const res = await axios.get(`${API_URL}/api/application/me`, {
-          withCredentials: true,
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        if (res.data.exists !== false) {
-          // Populate form
-          const { basicInfo, skillsAndLinks, accessibility } = res.data;
-          setFormData({
-            basicInfo: { ...formData.basicInfo, ...basicInfo },
-            skillsAndLinks: {
-              ...formData.skillsAndLinks,
-              ...skillsAndLinks,
-              skills: skillsAndLinks.skills
-                ? skillsAndLinks.skills.join(", ")
-                : "",
-            },
-            accessibility: { ...formData.accessibility, ...accessibility },
+        const token = localStorage.getItem("authToken");
+
+        // Admin: Fetch List of Apps
+        if (user.role === "admin") {
+          const res = await axios.get(`${API_URL}/api/admin/my-apps`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
           });
+          setAdminApps(res.data);
+          resetForm(); // Start with empty form for new submission
         } else {
-          // New application, prefill name/email if possible
-          setFormData((prev) => ({
-            ...prev,
-            basicInfo: { ...prev.basicInfo, fullName: user.username },
-          }));
+          // Normal User: Fetch Single App
+          const res = await axios.get(`${API_URL}/api/application/me`, {
+            withCredentials: true,
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          });
+          if (res.data.exists !== false) {
+            // Populate form
+            const { basicInfo, skillsAndLinks, accessibility } = res.data;
+            setFormData({
+              basicInfo: { ...formData.basicInfo, ...basicInfo },
+              skillsAndLinks: {
+                ...formData.skillsAndLinks,
+                ...skillsAndLinks,
+                skills: skillsAndLinks.skills
+                  ? skillsAndLinks.skills.join(", ")
+                  : "",
+              },
+              accessibility: { ...formData.accessibility, ...accessibility },
+            });
+          } else {
+            // New application
+            resetForm();
+          }
         }
       } catch (err) {
         Logger.error("Failed to load application", err);
@@ -81,13 +117,23 @@ const ApplicationPage: React.FC = () => {
     };
 
     try {
-      const token = localStorage.getItem("authToken"); // Get token
+      const token = localStorage.getItem("authToken");
       await axios.post(`${API_URL}/api/application/me`, payload, {
         withCredentials: true,
-        headers: token ? { Authorization: `Bearer ${token}` } : {}, // Send token
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       alert("Application Saved!");
-      navigate("/app/rsvp", { replace: true });
+
+      if (user.role === "admin") {
+        // Refresh list
+        const res = await axios.get(`${API_URL}/api/admin/my-apps`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+        setAdminApps(res.data);
+        resetForm(); // Reset for next
+      } else {
+        navigate("/app/rsvp", { replace: true });
+      }
     } catch (err) {
       Logger.error("Save failed", err);
       alert("Failed to save application.");
@@ -111,11 +157,63 @@ const ApplicationPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col relative">
       <Navbar />
-      <div className="flex-1 flex items-center justify-center p-4 pt-24">
+      <div className="flex-1 flex flex-col items-center p-4 pt-24">
+        {/* Admin Section */}
+        {user.role === "admin" && (
+          <div className="w-full max-w-4xl mb-8">
+            <h2 className="text-2xl font-bold mb-4 text-purple-400">
+              Admin Test Applications
+            </h2>
+            <div className="bg-gray-800 p-4 rounded-xl border border-gray-700">
+              {adminApps.length === 0 ? (
+                <p className="text-gray-400">No test applications yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {adminApps.map((app) => (
+                    <div
+                      key={app._id}
+                      className="flex justify-between items-center bg-gray-700 p-3 rounded"
+                    >
+                      <div>
+                        <span className="font-bold">
+                          {app.basicInfo.fullName}
+                        </span>
+                        <span className="ml-2 text-xs text-gray-400">
+                          {new Date(app.createdAt).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex gap-2 text-sm">
+                        <span
+                          className={
+                            app.accepted ? "text-green-400" : "text-yellow-400"
+                          }
+                        >
+                          {app.accepted ? "Accepted" : "Pending"}
+                        </span>
+                        <span
+                          className={
+                            app.rsvpd ? "text-green-400" : "text-gray-400"
+                          }
+                        >
+                          {app.rsvpd ? "RSVP'd" : "No RSVP"}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Container */}
         <div className="bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-4xl w-full border border-gray-700">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-bold">Hacker Application</h2>
+            <h2 className="text-3xl font-bold">
+              {user.role === "admin"
+                ? "Create Test Application"
+                : "Hacker Application"}
+            </h2>
             <button
               onClick={() => navigate("/app/rsvp")}
               className="text-blue-400 hover:text-blue-300"
@@ -263,7 +361,9 @@ const ApplicationPage: React.FC = () => {
               type="submit"
               className="w-full py-4 bg-linear-to-r from-purple-600 to-blue-600 rounded-lg font-bold text-lg hover:brightness-110 transition-all shadow-lg"
             >
-              Submit Application
+              {user.role === "admin"
+                ? "Create Test Record"
+                : "Submit Application"}
             </button>
           </form>
         </div>
