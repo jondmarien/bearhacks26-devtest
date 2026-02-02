@@ -204,6 +204,29 @@ const ApplicationPage = () => {
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-3xl opacity-30" />
       </div>
 
+      {/* Home Button */}
+      <div className="absolute top-6 left-6 z-50">
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center gap-2 px-4 py-2 bg-gray-900/50 hover:bg-gray-800 border border-gray-700/50 rounded-full text-gray-400 hover:text-white transition-all duration-200 group backdrop-blur-sm"
+        >
+          <svg
+            className="w-5 h-5 group-hover:-translate-x-1 transition-transform"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          <span className="font-medium">Home</span>
+        </button>
+      </div>
+
       <div className="relative z-10 container mx-auto px-4 py-12 max-w-4xl">
         {/* Header */}
         <header className="mb-12 text-center">
