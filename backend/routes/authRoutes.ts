@@ -113,8 +113,8 @@ router.get("/discord/callback", async (req: Request, res: Response) => {
     // Set Cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Set secure in prod
-      sameSite: "lax", // Needed for OAuth redirect flow
+      secure: true, // Always true for SameSite=None
+      sameSite: "none", // Required for cross-domain (Vercel -> Render)
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
