@@ -17,8 +17,10 @@ const RsvpPage: React.FC = () => {
 
   const fetchRsvp = async () => {
     try {
+      const token = localStorage.getItem("authToken");
       const res = await axios.get(`${API_URL}/api/rsvp/me`, {
         withCredentials: true,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       setStatus(res.data);
     } catch (err) {
@@ -34,7 +36,15 @@ const RsvpPage: React.FC = () => {
 
   const handleRsvp = async () => {
     try {
-      await axios.post(`${API_URL}/api/rsvp`, {}, { withCredentials: true });
+      const token = localStorage.getItem("authToken");
+      await axios.post(
+        `${API_URL}/api/rsvp`,
+        {},
+        {
+          withCredentials: true,
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        },
+      );
       fetchRsvp();
     } catch (err) {
       alert("Failed to RSVP. Ensure you are accepted.");

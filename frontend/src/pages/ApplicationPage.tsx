@@ -24,8 +24,10 @@ const ApplicationPage: React.FC = () => {
 
     const fetchApplication = async () => {
       try {
+        const token = localStorage.getItem("authToken"); // Get token
         const res = await axios.get(`${API_URL}/api/application/me`, {
           withCredentials: true,
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         if (res.data.exists !== false) {
           // Populate form
@@ -77,8 +79,10 @@ const ApplicationPage: React.FC = () => {
     };
 
     try {
+      const token = localStorage.getItem("authToken"); // Get token
       await axios.post(`${API_URL}/api/application/me`, payload, {
         withCredentials: true,
+        headers: token ? { Authorization: `Bearer ${token}` } : {}, // Send token
       });
       alert("Application Saved!");
       navigate("/app/rsvp");
