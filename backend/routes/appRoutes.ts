@@ -1,10 +1,22 @@
 import express, { type Response } from "express";
 import Application from "@/models/Application";
 import AdminApplication from "@/models/AdminApplication";
+import User from "@/models/User";
 import authMiddleware, { type AuthRequest } from "@/middleware/authMiddleware";
 import Logger from "@/utils/Logger";
+import { ApplicationSchema } from "@shared/schemas/application";
 
 const router = express.Router();
+
+// Helper to map validated Zod data to DB structure
+const mapApplicationData = (data: any) => ({
+  basicInfo: data.basicInfo,
+  skillsAndLinks: {
+    ...data.skillsAndLinks,
+    skills: data.skillsAndLinks.skills || [],
+  },
+  accessibility: data.accessibility,
+});
 
 // Middleware to ensure auth for all app routes
 router.use(authMiddleware);
@@ -30,7 +42,6 @@ router.get("/application/me", async (req: AuthRequest, res: Response) => {
 router.post("/application/me", async (req: AuthRequest, res: Response) => {
   try {
     // Validate with Zod
-    const { ApplicationSchema } = require("@shared/schemas/application");
     const validationResult = ApplicationSchema.safeParse(req.body);
 
     if (!validationResult.success) {
@@ -45,10 +56,9 @@ router.post("/application/me", async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    const { basicInfo, skillsAndLinks, accessibility } = validationResult.data;
+    const applicationData = mapApplicationData(validationResult.data);
 
     // CHECK IF ADMIN
-    const User = require("@/models/User").default;
     const user = await User.findById(req.userId);
 
     if (user && user.role === "admin") {
@@ -56,9 +66,7 @@ router.post("/application/me", async (req: AuthRequest, res: Response) => {
       // Always create NEW application in AdminApplication collection
       const adminApp = await AdminApplication.create({
         userId: req.userId,
-        basicInfo,
-        skillsAndLinks,
-        accessibility,
+        ...applicationData,
         accepted: false,
         rsvpd: false,
       });
@@ -72,18 +80,14 @@ router.post("/application/me", async (req: AuthRequest, res: Response) => {
     if (application) {
       Logger.info(`Updating application for user ${req.userId}`);
       // Update
-      application.basicInfo = basicInfo;
-      application.skillsAndLinks = skillsAndLinks;
-      application.accessibility = accessibility;
+      Object.assign(application, applicationData);
       await application.save();
     } else {
       Logger.info(`Creating new application for user ${req.userId}`);
       // Create
       application = await Application.create({
         userId: req.userId,
-        basicInfo,
-        skillsAndLinks,
-        accessibility,
+        ...applicationData,
         accepted: false,
         rsvpd: false,
       });
@@ -130,7 +134,6 @@ router.post("/rsvp", async (req: AuthRequest, res: Response) => {
   try {
     const { applicationId } = req.body;
 
-    const User = require("@/models/User").default;
     const user = await User.findById(req.userId);
     const isAdmin = user?.role === "admin";
 
