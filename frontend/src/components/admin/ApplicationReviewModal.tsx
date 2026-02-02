@@ -1,5 +1,6 @@
 import React from "react";
 import type { Application, TestApplication } from "@/types/admin";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ApplicationReviewModalProps {
   app: Application | TestApplication;
@@ -20,16 +21,31 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         className="absolute inset-0 bg-gray-950/80 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-gray-900 w-full max-w-2xl border border-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+
+      {/* Modal Container */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="relative bg-gray-900 w-full max-w-2xl border border-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+      >
         {/* Header */}
         <div className="p-6 border-b border-gray-800 flex justify-between items-start bg-gray-900/50">
           <div className="flex items-center gap-4">
             {isHacker && (
-              <img
+              <motion.img
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2 }}
                 src={`https://cdn.discordapp.com/avatars/${app.userId.discordId}/${app.userId.avatar}.png`}
                 alt="avatar"
                 className="w-16 h-16 rounded-2xl bg-gray-800 border border-gray-700 shadow-xl"
@@ -39,18 +55,33 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
               />
             )}
             <div>
-              <h2 className="text-2xl font-black text-white">
+              <motion.h2
+                initial={{ x: -10, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.1 }}
+                className="text-2xl font-black text-white"
+              >
                 {app.basicInfo.fullName}
-              </h2>
-              <p className="text-gray-400 font-medium">
+              </motion.h2>
+              <motion.p
+                initial={{ x: -10, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.15 }}
+                className="text-gray-400 font-medium"
+              >
                 {isHacker
                   ? app.userId.email
                   : `Test Subject #${app._id.slice(-6)}`}
-              </p>
+              </motion.p>
               {app.basicInfo.preferredName && (
-                <p className="text-xs text-purple-400 font-bold mt-1 uppercase tracking-tighter">
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-xs text-purple-400 font-bold mt-1 uppercase tracking-tighter"
+                >
                   Prefers: {app.basicInfo.preferredName}
-                </p>
+                </motion.p>
               )}
             </div>
           </div>
@@ -78,36 +109,31 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
         <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
           {/* Basic Info Grid */}
           <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-1">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                School
-              </label>
-              <p className="text-gray-200 font-bold">{app.basicInfo.school}</p>
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                Graduation
-              </label>
-              <p className="text-gray-200 font-bold">
-                Class of {app.basicInfo.year}
-              </p>
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                Location
-              </label>
-              <p className="text-gray-200 font-bold">
-                {app.basicInfo.location || "Remote / Not Specified"}
-              </p>
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
-                Discord
-              </label>
-              <p className="text-gray-200 font-bold">
-                {isHacker ? app.userId.username : "N/A"}
-              </p>
-            </div>
+            {[
+              { label: "School", value: app.basicInfo.school },
+              { label: "Graduation", value: `Class of ${app.basicInfo.year}` },
+              {
+                label: "Location",
+                value: app.basicInfo.location || "Remote / Not Specified",
+              },
+              {
+                label: "Discord",
+                value: isHacker ? app.userId.username : "N/A",
+              },
+            ].map((item, idx) => (
+              <motion.div
+                key={item.label}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 + idx * 0.05 }}
+                className="space-y-1"
+              >
+                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                  {item.label}
+                </label>
+                <p className="text-gray-200 font-bold">{item.value}</p>
+              </motion.div>
+            ))}
           </div>
 
           <hr className="border-gray-800" />
@@ -121,12 +147,15 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
             <div className="flex flex-wrap gap-2">
               {app.skillsAndLinks.skills.length > 0 ? (
                 app.skillsAndLinks.skills.map((skill, i) => (
-                  <span
+                  <motion.span
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3 + i * 0.03 }}
                     key={i}
                     className="px-3 py-1 bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded-lg font-bold"
                   >
                     {skill}
-                  </span>
+                  </motion.span>
                 ))
               ) : (
                 <span className="text-gray-500 text-sm italic">
@@ -137,7 +166,10 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
 
             <div className="grid grid-cols-1 gap-3 mt-4">
               {app.skillsAndLinks.githubUrl && (
-                <a
+                <motion.a
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
                   href={app.skillsAndLinks.githubUrl}
                   target="_blank"
                   rel="noreferrer"
@@ -155,10 +187,13 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
                   <span className="text-sm font-bold text-gray-300 group-hover:text-white truncate">
                     {app.skillsAndLinks.githubUrl}
                   </span>
-                </a>
+                </motion.a>
               )}
               {app.skillsAndLinks.portfolioUrl && (
-                <a
+                <motion.a
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.45 }}
                   href={app.skillsAndLinks.portfolioUrl}
                   target="_blank"
                   rel="noreferrer"
@@ -182,7 +217,7 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
                   <span className="text-sm font-bold text-gray-300 group-hover:text-white truncate">
                     {app.skillsAndLinks.portfolioUrl}
                   </span>
-                </a>
+                </motion.a>
               )}
             </div>
           </div>
@@ -196,36 +231,45 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
               Needs & Logistics
             </h3>
             <div className="p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10 space-y-4">
-              <div>
-                <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest block mb-1">
-                  Dietary Restrictions
-                </label>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {app.accessibility.dietaryRestrictions || "None"}
-                </p>
-              </div>
-              <div>
-                <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest block mb-1">
-                  Allergies
-                </label>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {app.accessibility.allergies || "None"}
-                </p>
-              </div>
-              <div>
-                <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest block mb-1">
-                  Accommodations
-                </label>
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  {app.accessibility.accommodations || "None"}
-                </p>
-              </div>
+              {[
+                {
+                  label: "Dietary Restrictions",
+                  value: app.accessibility.dietaryRestrictions || "None",
+                },
+                {
+                  label: "Allergies",
+                  value: app.accessibility.allergies || "None",
+                },
+                {
+                  label: "Accommodations",
+                  value: app.accessibility.accommodations || "None",
+                },
+              ].map((item, idx) => (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 + idx * 0.1 }}
+                >
+                  <label className="text-[10px] font-black text-blue-400 uppercase tracking-widest block mb-1">
+                    {item.label}
+                  </label>
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    {item.value}
+                  </p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="p-6 bg-gray-950/50 border-t border-gray-800 flex justify-between items-center">
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="p-6 bg-gray-950/50 border-t border-gray-800 flex justify-between items-center"
+        >
           <div className="flex items-center gap-3">
             <span
               className={`px-4 py-1.5 rounded-full text-xs font-black tracking-widest ${app.accepted ? "bg-green-500/10 text-green-400 border border-green-500/20" : "bg-yellow-500/10 text-yellow-400 border border-yellow-500/20"}`}
@@ -240,23 +284,27 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
           </div>
           <div className="flex gap-3">
             {!app.accepted ? (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => updateStatus(app._id, "accepted", !isHacker)}
-                className="bg-green-600 hover:bg-green-500 text-white px-8 py-3 rounded-2xl font-black text-sm transition-all shadow-xl active:scale-95 border border-green-400/20"
+                className="bg-green-600 hover:bg-green-500 text-white px-8 py-3 rounded-2xl font-black text-sm transition-all shadow-xl border border-green-400/20"
               >
                 Accept Applicant
-              </button>
+              </motion.button>
             ) : (
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => updateStatus(app._id, "rejected", !isHacker)}
-                className="bg-red-600 hover:bg-red-500 text-white px-8 py-3 rounded-2xl font-black text-sm transition-all shadow-xl active:scale-95 border border-red-400/20"
+                className="bg-red-600 hover:bg-red-500 text-white px-8 py-3 rounded-2xl font-black text-sm transition-all shadow-xl border border-red-400/20"
               >
                 Revoke Acceptance
-              </button>
+              </motion.button>
             )}
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 interface GlowBackgroundProps {
   color?: "purple" | "blue" | "red";
@@ -22,20 +23,47 @@ const GlowBackground: React.FC<GlowBackgroundProps> = ({
   const showTop = position === "top" || position === "both";
   const showBottom = position === "bottom" || position === "both";
   const glowColor = colorMap[color];
-  const pulseClass = animate ? "animate-pulse" : "";
 
   return (
     <div
       className={`absolute inset-0 overflow-hidden pointer-events-none -z-10 ${className}`}
     >
       {showTop && (
-        <div
-          className={`absolute top-1/4 left-1/4 w-[500px] h-[500px] ${glowColor} rounded-full blur-[120px] ${pulseClass}`}
+        <motion.div
+          animate={
+            animate
+              ? {
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.5, 0.3],
+                  x: [0, 20, 0],
+                }
+              : {}
+          }
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className={`absolute top-1/4 left-1/4 w-[500px] h-[500px] ${glowColor} rounded-full blur-[120px]`}
         />
       )}
       {showBottom && (
-        <div
-          className={`absolute bottom-1/4 right-1/4 w-[500px] h-[500px] ${glowColor} rounded-full blur-[120px] ${pulseClass} delay-700`}
+        <motion.div
+          animate={
+            animate
+              ? {
+                  scale: [1.2, 1, 1.2],
+                  opacity: [0.3, 0.5, 0.3],
+                  x: [0, -20, 0],
+                }
+              : {}
+          }
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className={`absolute bottom-1/4 right-1/4 w-[500px] h-[500px] ${glowColor} rounded-full blur-[120px]`}
         />
       )}
     </div>
