@@ -1,11 +1,10 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Navbar: React.FC = () => {
   const { user, login, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
   return (
     <nav className="w-full p-6 flex justify-between items-center bg-gray-900/50 backdrop-blur-md fixed top-0 left-0 z-10 border-b border-gray-800">
