@@ -13,4 +13,21 @@ export default defineConfig({
       zod: path.resolve(__dirname, "./node_modules/zod"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("react") || id.includes("scheduler")) {
+              return "vendor-react";
+            }
+            if (id.includes("framer-motion")) {
+              return "vendor-framer";
+            }
+            return "vendor-utils";
+          }
+        },
+      },
+    },
+  },
 });
