@@ -1,18 +1,18 @@
-
 # Use the official Bun image
 FROM oven/bun:1 as base
 WORKDIR /app
 
-# Copy package files
-COPY package.json ./
-# If you have a lockfile, uncomment the next line
-# COPY bun.lockb ./
+# Copy shared directory (assumes build context is root of repo)
+COPY shared /shared
+
+# Copy backend package files
+COPY backend/bun.lock ./
 
 # Install dependencies
 RUN bun install --production
 
-# Copy source code
-COPY . .
+# Copy backend source code
+COPY backend .
 
 # Expose port
 EXPOSE 5000
