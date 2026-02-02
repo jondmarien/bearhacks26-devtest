@@ -40,7 +40,10 @@ const applicationSchema = new Schema<IApplication>(
       preferredName: { type: String },
       email: { type: String },
       school: { type: String },
-      year: { type: String },
+      year: {
+        type: String,
+        match: [/^\d{4}$/, "Graduation year must be 4 digits"],
+      },
       location: { type: String },
     },
     skillsAndLinks: {

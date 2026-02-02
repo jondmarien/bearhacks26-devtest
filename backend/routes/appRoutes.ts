@@ -94,9 +94,12 @@ router.post("/application/me", async (req: AuthRequest, res: Response) => {
     }
 
     res.json(application);
-  } catch (error) {
+  } catch (error: any) {
     Logger.error("Save Application Error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({
+      message: "Server error",
+      error: error?.message || String(error),
+    });
   }
 });
 

@@ -9,7 +9,11 @@ export const BasicInfoSchema = z.object({
     .optional()
     .or(z.literal("")),
   school: z.string().optional(),
-  year: z.string().optional(),
+  year: z
+    .string()
+    .regex(/^\d{4}$/, { message: "Graduation year must be 4 digits" })
+    .optional()
+    .or(z.literal("")),
   location: z.string().optional(),
 });
 
@@ -21,6 +25,7 @@ export const AccessibilitySchema = z.object({
 
 // Helper for URL or Empty
 export const UrlOrEmpty = z
+  .string()
   .url({ message: "Invalid URL" })
   .optional()
   .or(z.literal(""));
