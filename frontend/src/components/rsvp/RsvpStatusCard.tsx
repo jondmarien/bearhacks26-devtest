@@ -14,13 +14,13 @@ const RsvpStatusCard: React.FC<RsvpStatusCardProps> = ({ status, onRsvp }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-gray-800 p-10 rounded-2xl shadow-2xl max-w-md w-full border border-gray-700 font-primary">
-      <h1 className="text-3xl font-black mb-8 bg-clip-text text-transparent bg-linear-to-r from-white to-gray-400">
+    <div className="bg-gray-800 p-10 rounded-2xl shadow-2xl max-w-md w-full border border-gray-700 font-primary text-center flex flex-col items-center">
+      <h1 className="text-3xl font-black mb-8 bg-clip-text text-transparent bg-linear-to-r from-white to-gray-400 mx-auto">
         RSVP Status
       </h1>
 
       {!status.hasApplication && (
-        <div className="space-y-6">
+        <div className="space-y-6 w-full">
           <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl text-blue-300 font-medium">
             Looks like you haven't started your journey yet!
           </div>
@@ -34,7 +34,7 @@ const RsvpStatusCard: React.FC<RsvpStatusCardProps> = ({ status, onRsvp }) => {
       )}
 
       {status.hasApplication && !status.accepted && (
-        <div className="p-6 bg-yellow-500/5 border border-yellow-500/20 rounded-2xl space-y-3">
+        <div className="p-6 bg-yellow-500/5 border border-yellow-500/20 rounded-2xl space-y-3 w-full">
           <div className="text-3xl">⏳</div>
           <h2 className="text-xl font-black text-yellow-400">Under Review</h2>
           <p className="text-gray-400 text-sm leading-relaxed">
@@ -45,7 +45,7 @@ const RsvpStatusCard: React.FC<RsvpStatusCardProps> = ({ status, onRsvp }) => {
       )}
 
       {status.hasApplication && status.accepted && !status.rsvpd && (
-        <div className="space-y-6">
+        <div className="space-y-6 w-full">
           <div className="p-6 bg-green-500/5 border border-green-500/20 rounded-2xl space-y-3">
             <div className="text-3xl">🎉</div>
             <h2 className="text-xl font-black text-green-400">Accepted!</h2>
@@ -64,7 +64,7 @@ const RsvpStatusCard: React.FC<RsvpStatusCardProps> = ({ status, onRsvp }) => {
       )}
 
       {status.rsvpd && (
-        <div className="space-y-6">
+        <div className="space-y-6 w-full flex flex-col items-center">
           <div className="relative inline-block">
             <div className="text-7xl mb-2">🎟️</div>
             <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full animate-ping"></div>
@@ -76,7 +76,7 @@ const RsvpStatusCard: React.FC<RsvpStatusCardProps> = ({ status, onRsvp }) => {
             Your spot is confirmed. Prepare for a weekend of innovation and
             bears.
           </p>
-          <div className="pt-6 border-t border-gray-700/50">
+          <div className="pt-6 border-t border-gray-700/50 w-full">
             <p className="text-xs font-black text-gray-500 uppercase tracking-widest">
               Check email for instructions
             </p>

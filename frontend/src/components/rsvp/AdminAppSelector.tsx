@@ -18,7 +18,7 @@ const AdminAppSelector: React.FC<AdminAppSelectorProps> = ({
   onSelect,
 }) => {
   return (
-    <div className="mb-8 w-full max-w-md bg-gray-800 p-4 rounded-xl border border-gray-700 font-primary">
+    <div className="mb-8 w-full max-w-md bg-gray-800 p-4 rounded-xl border border-gray-700 font-primary text-center">
       <label className="block text-sm font-black text-gray-500 uppercase tracking-widest mb-2">
         Select Test Application
       </label>
