@@ -5,6 +5,8 @@ import ApplicationPage from "@/pages/ApplicationPage";
 import RsvpPage from "@/pages/RsvpPage";
 import AdminLoginPage from "@/pages/AdminLoginPage";
 import AdminDashboard from "@/pages/AdminDashboard";
+import NotFoundPage from "@/pages/NotFoundPage";
+import ErrorPage from "@/pages/ErrorPage";
 import "@/index.css";
 
 function App() {
@@ -17,7 +19,8 @@ function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/app/apply" element={<ApplicationPage />} />
           <Route path="/app/rsvp" element={<RsvpPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/error" element={<ErrorPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
