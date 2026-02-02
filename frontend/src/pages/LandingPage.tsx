@@ -67,13 +67,13 @@ const LandingPage: React.FC = () => {
                       onClick={() => navigate("/admin/dashboard")}
                       className="w-full md:w-auto px-10 py-5 bg-linear-to-r from-purple-600 to-blue-600 rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl border border-white/10"
                     >
-                      Dashboard
+                      Admin Dashboard
                     </button>
                     <button
                       onClick={() => navigate("/app/apply")}
                       className="w-full md:w-auto px-10 py-5 bg-gray-800 border-2 border-gray-700/50 rounded-2xl font-black text-xl transition-all hover:scale-105 active:scale-95 shadow-xl hover:border-purple-500/50 hover:text-purple-400"
                     >
-                      Make Test App
+                      Make Test Application
                     </button>
                     <button
                       onClick={() => navigate("/app/rsvp")}
@@ -88,7 +88,7 @@ const LandingPage: React.FC = () => {
                       onClick={() => navigate("/app/apply")}
                       className="w-full md:w-auto px-10 py-5 bg-linear-to-r from-purple-600 to-blue-600 rounded-2xl font-black text-xl hover:scale-105 active:scale-95 transition-all shadow-2xl border border-white/10"
                     >
-                      Dashboard
+                      Apply
                     </button>
                     <button
                       onClick={() => navigate("/app/rsvp")}
