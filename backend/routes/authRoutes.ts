@@ -1,9 +1,10 @@
 import express, { type Request, type Response } from "express";
 import jwt from "jsonwebtoken";
-import User from "../models/User";
-import type { AuthRequest } from "../middleware/authMiddleware";
-import authMiddleware from "../middleware/authMiddleware";
+import User from "@/models/User";
+import type { AuthRequest } from "@/middleware/authMiddleware";
+import authMiddleware from "@/middleware/authMiddleware";
 import bcrypt from "bcryptjs";
+import Logger from "@/utils/Logger";
 
 const router = express.Router();
 
@@ -79,7 +80,7 @@ router.get("/discord/callback", async (req: Request, res: Response) => {
     const tokenData = (await tokenResponse.json()) as DiscordTokenResponse;
 
     if (tokenData.error) {
-      console.error("Discord Token Error:", tokenData);
+      Logger.error("Discord Token Error:", tokenData);
       res.status(400).send("Error fetching token from Discord");
       return;
     }
@@ -96,7 +97,7 @@ router.get("/discord/callback", async (req: Request, res: Response) => {
     // Upsert User
     let user = await User.findOne({ discordId: userData.id });
     if (!user) {
-      console.log("Creating new user:", userData.username);
+      Logger.info("Creating new user:", userData.username);
       user = await User.create({
         discordId: userData.id,
         username: userData.username,
@@ -105,7 +106,7 @@ router.get("/discord/callback", async (req: Request, res: Response) => {
         email: userData.email,
       });
     } else {
-      console.log("Updating existing user:", userData.username);
+      Logger.info("Updating existing user:", userData.username);
       // Update fields if changed
       user.username = userData.username;
       user.discriminator = userData.discriminator;
@@ -127,12 +128,12 @@ router.get("/discord/callback", async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    console.log("Auth successful for user:", userData.username);
+    Logger.success("Auth successful for user:", userData.username);
 
     // Redirect to frontend app with Token in parameter (for Bearer auth fallback)
     res.redirect(`${process.env.FRONTEND_URL}/app/apply?token=${token}`);
   } catch (error) {
-    console.error("Auth Error:", error);
+    Logger.error("Auth Error:", error);
     res.status(500).send("Internal Server Error");
   }
 });
@@ -140,12 +141,12 @@ router.get("/discord/callback", async (req: Request, res: Response) => {
 // Admin Login
 router.post("/login", async (req: Request, res: Response) => {
   const { username } = req.body;
-  console.log(`Attempting admin login for: ${username}`);
+  Logger.info(`Attempting admin login for: ${username}`);
 
   try {
     const user = await User.findOne({ username }).select("+password");
     if (!user || !user.password) {
-      console.warn(
+      Logger.warn(
         `Admin login failed: User not found or no password set for ${username}`,
       );
       res.status(401).json({ message: "Invalid credentials" });
@@ -154,7 +155,7 @@ router.post("/login", async (req: Request, res: Response) => {
 
     const isMatch = await bcrypt.compare(req.body.password, user.password);
     if (!isMatch) {
-      console.warn(`Admin login failed: Invalid password for ${username}`);
+      Logger.warn(`Admin login failed: Invalid password for ${username}`);
       res.status(401).json({ message: "Invalid credentials" });
       return;
     }
@@ -171,10 +172,10 @@ router.post("/login", async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    console.log(`Admin login successful: ${username}`);
+    Logger.success(`Admin login successful: ${username}`);
     res.json({ token, user });
   } catch (error) {
-    console.error("Login error:", error);
+    Logger.error("Login error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -203,7 +204,7 @@ router.get("/me", authMiddleware, async (req: AuthRequest, res: Response) => {
 });
 
 router.get("/logout", (req: Request, res: Response) => {
-  console.log("User logging out");
+  Logger.info("User logging out");
   res.clearCookie("token");
   res.json({ success: true });
 });

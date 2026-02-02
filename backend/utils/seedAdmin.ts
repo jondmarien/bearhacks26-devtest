@@ -1,11 +1,12 @@
-import User from "../models/User";
+import User from "@/models/User";
 import bcrypt from "bcryptjs";
+import Logger from "@/utils/Logger";
 
 const seedAdmin = async () => {
   try {
     const adminExists = await User.findOne({ username: "admin" });
     if (adminExists) {
-      console.log("Admin account already exists.");
+      Logger.info("Admin account already exists.");
       return;
     }
 
@@ -21,9 +22,11 @@ const seedAdmin = async () => {
     });
 
     await adminUser.save();
-    console.log("Default admin account created: admin / bearhacks2026@admin");
+    Logger.success(
+      "Default admin account created: admin / bearhacks2026@admin",
+    );
   } catch (error) {
-    console.error("Error seeding admin:", error);
+    Logger.error("Error seeding admin:", error);
   }
 };
 

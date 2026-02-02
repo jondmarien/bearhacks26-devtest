@@ -2,11 +2,12 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import connectDB from "./db";
-import seedAdmin from "./utils/seedAdmin";
-import adminRoutes from "./routes/adminRoutes";
-import authRoutes from "./routes/authRoutes";
-import appRoutes from "./routes/appRoutes";
+import connectDB from "@/db";
+import seedAdmin from "@/utils/seedAdmin";
+import Logger from "@/utils/Logger";
+import adminRoutes from "@/routes/adminRoutes";
+import authRoutes from "@/routes/authRoutes";
+import appRoutes from "@/routes/appRoutes";
 
 dotenv.config();
 
@@ -26,13 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Request Logger
-app.use((req, res, next) => {
-  const ip = req.headers["x-forwarded-for"] || req.ip;
-  console.log(
-    `[${new Date().toISOString()}] ${req.method} ${req.url} - IP: ${ip}`,
-  );
-  next();
-});
+app.use(Logger.httpLogger.bind(Logger));
 
 // Database Connection
 connectDB().then(() => {
@@ -49,5 +44,5 @@ app.use("/api/admin", adminRoutes);
 app.use("/api", appRoutes);
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  Logger.info(`Server running on port ${PORT}`);
 });

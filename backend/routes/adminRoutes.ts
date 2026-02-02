@@ -1,8 +1,9 @@
 import express, { type Request, type Response } from "express";
-import Application from "../models/Application";
-import User from "../models/User";
-import authMiddleware, { type AuthRequest } from "../middleware/authMiddleware";
-import adminMiddleware from "../middleware/adminMiddleware";
+import Application from "@/models/Application";
+import User from "@/models/User";
+import authMiddleware, { type AuthRequest } from "@/middleware/authMiddleware";
+import adminMiddleware from "@/middleware/adminMiddleware";
+import Logger from "@/utils/Logger";
 
 const router = express.Router();
 
@@ -17,10 +18,10 @@ router.get("/applications", async (req: Request, res: Response) => {
       "userId",
       "username email discordId avatar",
     );
-    console.log(`Admin fetched ${applications.length} applications`);
+    Logger.info(`Admin fetched ${applications.length} applications`);
     res.json(applications);
   } catch (error) {
-    console.error("Error fetching applications:", error);
+    Logger.error("Error fetching applications:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -36,7 +37,7 @@ router.post("/application/:id/status", async (req: Request, res: Response) => {
   }
 
   const accepted = status === "accepted";
-  console.log(
+  Logger.info(
     `Admin updating application ${id} to status: ${status} (accepted: ${accepted})`,
   );
 
@@ -48,15 +49,15 @@ router.post("/application/:id/status", async (req: Request, res: Response) => {
     );
 
     if (!application) {
-      console.warn(`Admin update failed: Application ${id} not found`);
+      Logger.warn(`Admin update failed: Application ${id} not found`);
       res.status(404).json({ message: "Application not found" });
       return;
     }
 
-    console.log(`Application ${id} updated successfully`);
+    Logger.success(`Application ${id} updated successfully`);
     res.json(application);
   } catch (error) {
-    console.error("Error updating application:", error);
+    Logger.error("Error updating application:", error);
     res.status(500).json({ message: "Server error" });
   }
 });

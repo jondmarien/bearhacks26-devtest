@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import LandingPage from "./pages/LandingPage";
-import ApplicationPage from "./pages/ApplicationPage";
-import RsvpPage from "./pages/RsvpPage";
-import AdminLoginPage from "./pages/AdminLoginPage";
-import AdminDashboard from "./pages/AdminDashboard";
-import "./index.css";
+import { AuthProvider } from "@/context/AuthContext";
+import LandingPage from "@/pages/LandingPage";
+import ApplicationPage from "@/pages/ApplicationPage";
+import RsvpPage from "@/pages/RsvpPage";
+import AdminLoginPage from "@/pages/AdminLoginPage";
+import AdminDashboard from "@/pages/AdminDashboard";
+import "@/index.css";
 
 function App() {
   return (

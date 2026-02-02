@@ -1,6 +1,7 @@
 import express, { type Response } from "express";
-import Application from "../models/Application";
-import authMiddleware, { type AuthRequest } from "../middleware/authMiddleware";
+import Application from "@/models/Application";
+import authMiddleware, { type AuthRequest } from "@/middleware/authMiddleware";
+import Logger from "@/utils/Logger";
 
 const router = express.Router();
 
@@ -38,14 +39,14 @@ router.post("/application/me", async (req: AuthRequest, res: Response) => {
     let application = await Application.findOne({ userId: req.userId });
 
     if (application) {
-      console.log(`Updating application for user ${req.userId}`);
+      Logger.info(`Updating application for user ${req.userId}`);
       // Update
       application.basicInfo = basicInfo;
       application.skillsAndLinks = skillsAndLinks;
       application.accessibility = accessibility;
       await application.save();
     } else {
-      console.log(`Creating new application for user ${req.userId}`);
+      Logger.info(`Creating new application for user ${req.userId}`);
       // Create
       application = await Application.create({
         userId: req.userId,
@@ -59,7 +60,7 @@ router.post("/application/me", async (req: AuthRequest, res: Response) => {
 
     res.json(application);
   } catch (error) {
-    console.error("Save Application Error:", error);
+    Logger.error("Save Application Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -97,13 +98,13 @@ router.post("/rsvp", async (req: AuthRequest, res: Response) => {
     const application = await Application.findOne({ userId: req.userId });
 
     if (!application) {
-      console.warn(`RSVP failed: No application for user ${req.userId}`);
+      Logger.warn(`RSVP failed: No application for user ${req.userId}`);
       res.status(400).json({ message: "No application found" });
       return;
     }
 
     if (!application.accepted) {
-      console.warn(
+      Logger.warn(
         `RSVP failed: Application not accepted for user ${req.userId}`,
       );
       res.status(403).json({ message: "Application not accepted yet" });
@@ -111,18 +112,18 @@ router.post("/rsvp", async (req: AuthRequest, res: Response) => {
     }
 
     if (application.rsvpd) {
-      console.log(`User ${req.userId} already RSVP'd`);
+      Logger.info(`User ${req.userId} already RSVP'd`);
       res.json({ rsvpd: true }); // Idempotent
       return;
     }
 
-    console.log(`User ${req.userId} confirmed RSVP`);
+    Logger.success(`User ${req.userId} confirmed RSVP`);
     application.rsvpd = true;
     await application.save();
 
     res.json({ rsvpd: true });
   } catch (error) {
-    console.error("RSVP Error:", error);
+    Logger.error("RSVP Error:", error);
     res.status(500).json({ message: "Server error" });
   }
 });

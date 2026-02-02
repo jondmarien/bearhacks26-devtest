@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+import Logger from "@/utils/Logger";
 
 interface User {
   id: string;
@@ -45,12 +46,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       // 2. Get token from storage
       const token = localStorage.getItem("authToken");
 
-      console.log("Checking auth status...", `${API_URL}/auth/me`);
+      Logger.debug(`Checking auth status... ${API_URL}/auth/me`);
       const res = await axios.get(`${API_URL}/auth/me`, {
         withCredentials: true,
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      console.log("Auth response:", res.data);
+      Logger.debug("Auth response:", res.data);
       if (res.data.authenticated) {
         setUser(res.data.user);
       } else {
@@ -58,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         localStorage.removeItem("authToken");
       }
     } catch (error) {
-      console.error("Auth check failed full error:", error);
+      Logger.error("Auth check failed:", error);
       setUser(null);
       // Optional: don't clear default, but if 401, maybe clear?
     } finally {
@@ -85,7 +86,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.setItem("authToken", token);
       setUser(user);
     } catch (error) {
-      console.error("Login failed", error);
+      Logger.error("Login failed", error);
       throw error;
     }
   };
@@ -97,7 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       localStorage.removeItem("authToken");
       window.location.href = "/";
     } catch (error) {
-      console.error("Logout failed", error);
+      Logger.error("Logout failed", error);
     }
   };
 

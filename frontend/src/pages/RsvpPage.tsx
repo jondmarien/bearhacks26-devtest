@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { Navigate, useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Navbar from "@/components/Navbar";
+import Logger from "@/utils/Logger";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -25,7 +26,7 @@ const RsvpPage: React.FC = () => {
       });
       setStatus(res.data);
     } catch (err) {
-      console.error("Failed to load RSVP status", err);
+      Logger.error("Failed to load RSVP status", err);
     } finally {
       setLoading(false);
     }

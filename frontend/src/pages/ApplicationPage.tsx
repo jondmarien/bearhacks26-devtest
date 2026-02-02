@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { Navigate, useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Navbar from "@/components/Navbar";
+import Logger from "@/utils/Logger";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
@@ -52,7 +53,7 @@ const ApplicationPage: React.FC = () => {
           }));
         }
       } catch (err) {
-        console.error("Failed to load application", err);
+        Logger.error("Failed to load application", err);
       } finally {
         setLoading(false);
       }
@@ -88,7 +89,7 @@ const ApplicationPage: React.FC = () => {
       alert("Application Saved!");
       navigate("/app/rsvp", { replace: true });
     } catch (err) {
-      console.error("Save failed", err);
+      Logger.error("Save failed", err);
       alert("Failed to save application.");
     }
   };
