@@ -68,6 +68,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       Logger.error("Auth check failed:", error);
       setUser(null);
     } finally {
+      // Artificial delay to show off the cool honeycomb loader!
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       setLoading(false);
     }
   };
