@@ -6,12 +6,14 @@ WORKDIR /app
 COPY shared /shared
 
 # --- Build Frontend ---
-# Copy frontend source
-COPY frontend /frontend
 WORKDIR /frontend
 
-# Install frontend dependencies and build
+# Copy package files first to cache dependencies
+COPY frontend/package.json frontend/bun.lock ./
 RUN bun install
+
+# Copy source code and build
+COPY frontend .
 RUN bun run build
 
 # --- Setup Backend ---
