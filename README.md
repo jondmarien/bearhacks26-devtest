@@ -37,7 +37,7 @@ bun run dev
 - **Admin Panel**: Dashboard for organizers to review and accept applications.
     - **Login**: `/admin`
     - **Default User**: `admin`
-    - **Default Pass**: `bearhacks2026@admin`
+    - **Default Pass**: `[PASSWORD]`
 - **Logging**: Comprehensive logging for all requests and critical actions.
 
 ## 🛠️ Technology Stack
