@@ -6,12 +6,14 @@ interface User {
   discordId: string;
   username: string;
   avatar?: string;
+  role: "user" | "admin";
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: () => void;
+  loginWithPassword: (username: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -72,6 +74,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     window.location.href = `${API_URL}/auth/discord`;
   };
 
+  const loginWithPassword = async (username: string, password: string) => {
+    try {
+      const res = await axios.post(
+        `${API_URL}/auth/login`,
+        { username, password },
+        { withCredentials: true },
+      );
+      const { token, user } = res.data;
+      localStorage.setItem("authToken", token);
+      setUser(user);
+    } catch (error) {
+      console.error("Login failed", error);
+      throw error;
+    }
+  };
+
   const logout = async () => {
     try {
       await axios.get(`${API_URL}/auth/logout`, { withCredentials: true });
@@ -84,7 +102,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, loginWithPassword, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

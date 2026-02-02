@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./db";
+import seedAdmin from "./utils/seedAdmin";
+import adminRoutes from "./routes/adminRoutes";
 import authRoutes from "./routes/authRoutes";
 import appRoutes from "./routes/appRoutes";
 
@@ -24,7 +26,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Database Connection
-connectDB();
+connectDB().then(() => {
+  seedAdmin();
+});
 
 // Routes
 app.get("/", (req, res) => {
@@ -32,6 +36,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api", appRoutes);
 
 app.listen(PORT, () => {

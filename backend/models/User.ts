@@ -6,6 +6,8 @@ export interface IUser extends Document {
   discriminator?: string;
   avatar?: string;
   email?: string;
+  password?: string;
+  role: "user" | "admin";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,6 +19,8 @@ const userSchema = new Schema<IUser>(
     discriminator: { type: String },
     avatar: { type: String },
     email: { type: String, unique: true, sparse: true },
+    password: { type: String, select: false },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
   },
   {
     timestamps: true,
