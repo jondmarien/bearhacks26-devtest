@@ -77,4 +77,43 @@ router.post("/application/:id/status", async (req: Request, res: Response) => {
   }
 });
 
+// Update AdminApplication status
+router.post(
+  "/test-application/:id/status",
+  async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!["accepted", "rejected", "pending"].includes(status)) {
+      res.status(400).json({ message: "Invalid status" });
+      return;
+    }
+
+    const accepted = status === "accepted";
+    Logger.info(
+      `Admin updating TEST application ${id} to status: ${status} (accepted: ${accepted})`,
+    );
+
+    try {
+      const application = await AdminApplication.findOneAndUpdate(
+        { _id: id, userId: req.userId }, // Ensure they only touch their own test apps or all? requested: "admin test applications to accept or deny for testing"
+        { accepted },
+        { new: true },
+      );
+
+      if (!application) {
+        Logger.warn(`Admin update failed: Test Application ${id} not found`);
+        res.status(404).json({ message: "Test Application not found" });
+        return;
+      }
+
+      Logger.success(`Test Application ${id} updated successfully`);
+      res.json(application);
+    } catch (error) {
+      Logger.error("Error updating test application:", error);
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+);
+
 export default router;
