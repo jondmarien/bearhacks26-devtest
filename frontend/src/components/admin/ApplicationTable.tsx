@@ -54,7 +54,7 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
                         />
                         <div>
                           <div className="font-bold text-white group-hover:text-purple-300 transition-colors">
-                            {app.basicInfo.fullName}
+                            {app.basicInfo.firstName} {app.basicInfo.lastName}
                           </div>
                           <div className="text-xs text-gray-500 font-mono text-nowrap">
                             {app.userId.email}
@@ -64,7 +64,7 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
                     ) : (
                       <div>
                         <div className="font-bold text-white group-hover:text-purple-300 transition-colors">
-                          {app.basicInfo.fullName}
+                          {app.basicInfo.firstName} {app.basicInfo.lastName}
                         </div>
                         <div className="text-[10px] text-gray-500 font-mono mt-1">
                           ID: {app._id.slice(-8)}

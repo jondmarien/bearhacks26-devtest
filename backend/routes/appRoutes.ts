@@ -11,11 +11,10 @@ const router = express.Router();
 // Helper to map validated Zod data to DB structure
 const mapApplicationData = (data: any) => ({
   basicInfo: data.basicInfo,
-  skillsAndLinks: {
-    ...data.skillsAndLinks,
-    skills: data.skillsAndLinks.skills || [],
-  },
-  accessibility: data.accessibility,
+  hackerExperience: data.hackerExperience,
+  work: data.work,
+  additionalNeeds: data.additionalNeeds,
+  diversity: data.diversity,
 });
 
 // Middleware to ensure auth for all app routes
@@ -38,8 +37,8 @@ router.get("/application/me", async (req: AuthRequest, res: Response) => {
   }
 });
 
-// POST /api/application/me
-router.post("/application/me", async (req: AuthRequest, res: Response) => {
+// POST /api/application
+router.post("/application", async (req: AuthRequest, res: Response) => {
   try {
     // Validate with Zod
     const validationResult = ApplicationSchema.safeParse(req.body);

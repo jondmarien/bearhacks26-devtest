@@ -63,7 +63,7 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
                 transition={{ delay: 0.1 }}
                 className="text-2xl font-black text-white"
               >
-                {app.basicInfo.fullName}
+                {app.basicInfo.firstName} {app.basicInfo.lastName}
               </motion.h2>
               <motion.p
                 initial={{ x: -10, opacity: 0 }}
@@ -107,12 +107,19 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
               { label: "School", value: app.basicInfo.school },
               { label: "Graduation", value: `Class of ${app.basicInfo.year}` },
               {
+                label: "Major",
+                value: app.basicInfo.major || "N/A",
+              },
+              {
                 label: "Location",
-                value: app.basicInfo.location || "Remote / Not Specified",
+                value:
+                  `${app.basicInfo.city}, ${app.basicInfo.country}` || "N/A",
               },
               {
                 label: "Discord",
-                value: isHacker ? app.userId.username : "N/A",
+                value: isHacker
+                  ? app.userId.username
+                  : app.basicInfo.discord || "N/A",
               },
             ].map((item) => (
               <StaggerItem key={item.label} className="space-y-1">
@@ -126,34 +133,56 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
 
           <hr className="border-gray-800" />
 
-          {/* Skills & Experience */}
+          {/* Experience Section */}
           <div className="space-y-4">
             <h3 className="text-sm font-black text-white flex items-center gap-2">
               <span className="w-1.5 h-4 bg-purple-500 rounded-full"></span>
-              Skills & Experience
+              Experience & Work
             </h3>
-            <StaggerContainer className="flex flex-wrap gap-2">
-              {app.skillsAndLinks.skills.length > 0 ? (
-                app.skillsAndLinks.skills.map((skill, i) => (
-                  <StaggerItem
-                    key={i}
-                    className="px-3 py-1 bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded-lg font-bold"
-                  >
-                    {skill}
-                  </StaggerItem>
-                ))
-              ) : (
-                <span className="text-gray-500 text-sm italic">
-                  No skills listed
+
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div>
+                <span className="text-xs text-gray-500 uppercase font-bold">
+                  Hackathons
                 </span>
-              )}
+                <p className="text-white font-medium">
+                  {app.hackerExperience?.hackathonCount || "N/A"}
+                </p>
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 uppercase font-bold">
+                  Hacker Type
+                </span>
+                <p className="text-white font-medium">
+                  {app.hackerExperience?.hackerType || "N/A"}
+                </p>
+              </div>
+            </div>
+
+            <StaggerContainer className="flex flex-wrap gap-2">
+              {app.hackerExperience?.workshops &&
+                app.hackerExperience.workshops.length > 0 && (
+                  <>
+                    <span className="text-xs text-gray-500 w-full mb-1">
+                      Interests:
+                    </span>
+                    {app.hackerExperience.workshops.map((ws, i) => (
+                      <StaggerItem
+                        key={i}
+                        className="px-3 py-1 bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded-lg font-bold"
+                      >
+                        {ws}
+                      </StaggerItem>
+                    ))}
+                  </>
+                )}
             </StaggerContainer>
 
             <div className="grid grid-cols-1 gap-3 mt-4">
-              {app.skillsAndLinks.githubUrl && (
+              {app.work?.githubUrl && (
                 <HoverSpring>
                   <a
-                    href={app.skillsAndLinks.githubUrl}
+                    href={app.work.githubUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all group"
@@ -168,15 +197,15 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
                       </svg>
                     </div>
                     <span className="text-sm font-bold text-gray-300 group-hover:text-white truncate">
-                      {app.skillsAndLinks.githubUrl}
+                      {app.work.githubUrl}
                     </span>
                   </a>
                 </HoverSpring>
               )}
-              {app.skillsAndLinks.portfolioUrl && (
+              {app.work?.portfolioUrl && (
                 <HoverSpring>
                   <a
-                    href={app.skillsAndLinks.portfolioUrl}
+                    href={app.work.portfolioUrl}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all group"
@@ -197,7 +226,24 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
                       </svg>
                     </div>
                     <span className="text-sm font-bold text-gray-300 group-hover:text-white truncate">
-                      {app.skillsAndLinks.portfolioUrl}
+                      {app.work.portfolioUrl}
+                    </span>
+                  </a>
+                </HoverSpring>
+              )}
+              {app.work?.linkedinUrl && (
+                <HoverSpring>
+                  <a
+                    href={app.work.linkedinUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl transition-all group"
+                  >
+                    <div className="w-8 h-8 flex items-center justify-center bg-gray-950 rounded-lg text-white">
+                      <span className="font-bold text-xs">IN</span>
+                    </div>
+                    <span className="text-sm font-bold text-gray-300 group-hover:text-white truncate">
+                      {app.work.linkedinUrl}
                     </span>
                   </a>
                 </HoverSpring>
@@ -207,7 +253,7 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
 
           <hr className="border-gray-800" />
 
-          {/* Accessibility */}
+          {/* Additional Needs */}
           <div className="space-y-4">
             <h3 className="text-sm font-black text-white flex items-center gap-2">
               <span className="w-1.5 h-4 bg-blue-500 rounded-full"></span>
@@ -217,15 +263,21 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
               {[
                 {
                   label: "Dietary Restrictions",
-                  value: app.accessibility.dietaryRestrictions || "None",
+                  value: app.additionalNeeds?.dietary?.join(", ") || "None",
                 },
                 {
-                  label: "Allergies",
-                  value: app.accessibility.allergies || "None",
+                  label: "Accessibility",
+                  value: app.additionalNeeds?.accessibility || "None",
                 },
                 {
-                  label: "Accommodations",
-                  value: app.accessibility.accommodations || "None",
+                  label: "Ethnicity",
+                  value: app.diversity?.ethnicity || "Prefer not to say",
+                },
+                {
+                  label: "Gender / Pronouns",
+                  value:
+                    `${app.diversity?.gender || ""} ${app.diversity?.pronouns ? `(${app.diversity.pronouns})` : ""}`.trim() ||
+                    "Prefer not to say",
                 },
               ].map((item) => (
                 <StaggerItem key={item.label}>
@@ -238,6 +290,58 @@ const ApplicationReviewModal: React.FC<ApplicationReviewModalProps> = ({
                 </StaggerItem>
               ))}
             </StaggerContainer>
+          </div>
+
+          <hr className="border-gray-800" />
+
+          {/* Consent & Agreements */}
+          <div className="space-y-4">
+            <h3 className="text-sm font-black text-white flex items-center gap-2">
+              <span className="w-1.5 h-4 bg-green-500 rounded-full"></span>
+              Consent & Agreements
+            </h3>
+            <div className="grid grid-cols-2 gap-4 p-4 bg-green-500/5 rounded-2xl border border-green-500/10">
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-4 h-4 rounded-full flex items-center justify-center ${app.consent?.shareWithSponsors ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}
+                >
+                  {app.consent?.shareWithSponsors ? "✓" : "✕"}
+                </div>
+                <span className="text-xs text-gray-300 font-medium">
+                  Shared with Sponsors
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-4 h-4 rounded-full flex items-center justify-center ${app.consent?.mlhCodeOfConduct ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}
+                >
+                  {app.consent?.mlhCodeOfConduct ? "✓" : "✕"}
+                </div>
+                <span className="text-xs text-gray-300 font-medium">
+                  MLH Code of Conduct
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-4 h-4 rounded-full flex items-center justify-center ${app.consent?.mlhPrivacyPolicy ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}
+                >
+                  {app.consent?.mlhPrivacyPolicy ? "✓" : "✕"}
+                </div>
+                <span className="text-xs text-gray-300 font-medium">
+                  MLH Privacy Policy
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-4 h-4 rounded-full flex items-center justify-center ${app.consent?.commute ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"}`}
+                >
+                  {app.consent?.commute ? "✓" : "✕"}
+                </div>
+                <span className="text-xs text-gray-300 font-medium">
+                  Commute / Travel
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 

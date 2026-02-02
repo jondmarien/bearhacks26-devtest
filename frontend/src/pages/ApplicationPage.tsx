@@ -1,118 +1,86 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useAuth } from "@/context/AuthContext";
-import { Navigate, useNavigate } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import Logger from "@/utils/Logger";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ApplicationSchema,
   type ApplicationData,
 } from "@shared/schemas/application";
-import SubmissionErrorModal from "@/components/application/SubmissionErrorModal";
-import AdminTestAppsList from "@/components/application/AdminTestAppsList";
+import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
+import { useNavigate, Navigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import LoadingScreen from "@/components/layout/LoadingScreen";
-import {
-  BasicInfoSection,
-  SkillsLinksSection,
-  AccessibilitySection,
-} from "@/components/application/FormSections";
 
-const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+// Wizard Components
+import WizardProgress from "@/components/application/wizard/WizardProgress";
+import WizardNavigation from "@/components/application/wizard/WizardNavigation";
+import StepAboutYou from "@/components/application/wizard/StepAboutYou";
+import StepExperience from "@/components/application/wizard/StepExperience";
+import StepWork from "@/components/application/wizard/StepWork";
+import StepNeeds from "@/components/application/wizard/StepNeeds";
+import StepDiversity from "@/components/application/wizard/StepDiversity";
+import StepConsent from "@/components/application/wizard/StepConsent";
+import StepReview from "@/components/application/wizard/StepReview";
 
-interface AdminApp {
-  _id: string;
-  basicInfo: { fullName: string };
-  accepted: boolean;
-  rsvpd: boolean;
-  createdAt: string;
-}
+const STEPS = [
+  "About You",
+  "Hacker Experience",
+  "Your Work",
+  "Additional Needs",
+  "Diversity Check",
+  "Consent & Agreement",
+  "Review",
+];
 
-const ApplicationPage: React.FC = () => {
+const ApplicationPage = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [adminApps, setAdminApps] = useState<AdminApp[]>([]);
-  const [submitError, setSubmitError] = useState<{
-    message: string;
-    details?: any;
-  } | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
 
   const {
     register,
     handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
+    trigger,
     setValue,
+    watch,
+    reset,
+    formState: { errors },
   } = useForm<ApplicationData>({
     resolver: zodResolver(ApplicationSchema),
+    mode: "onChange",
+    defaultValues: {
+      consent: {
+        shareWithSponsors: false,
+        mlhCodeOfConduct: false,
+        mlhPrivacyPolicy: false,
+        mlhEmails: false,
+        commute: false,
+        accurateInfo: false,
+      },
+    },
   });
 
-  useEffect(() => {
-    if (!user) return;
+  const formData = watch();
 
+  useEffect(() => {
     const fetchApplication = async () => {
+      if (!user) return;
       try {
         const token = localStorage.getItem("authToken");
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/application/me`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
 
-        if (user.role === "admin") {
-          const res = await axios.get(`${API_URL}/api/admin/my-apps`, {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-          });
-          setAdminApps(res.data);
-          reset({
-            basicInfo: {
-              fullName: user.username,
-              email: "",
-              school: "",
-              year: "",
-              location: "",
-            },
-            skillsAndLinks: {
-              skills: [],
-              githubUrl: "",
-              portfolioUrl: "",
-              otherLinks: [],
-            },
-            accessibility: {
-              allergies: "",
-              dietaryRestrictions: "",
-              accommodations: "",
-            },
-          });
-        } else {
-          const res = await axios.get(`${API_URL}/api/application/me`, {
-            withCredentials: true,
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-          });
-          if (res.data.exists !== false) {
-            reset(res.data);
-          } else {
-            reset({
-              basicInfo: {
-                fullName: user.username,
-                email: "",
-                school: "",
-                year: "",
-                location: "",
-              },
-              skillsAndLinks: {
-                skills: [],
-                githubUrl: "",
-                portfolioUrl: "",
-                otherLinks: [],
-              },
-              accessibility: {
-                allergies: "",
-                dietaryRestrictions: "",
-                accommodations: "",
-              },
-            });
-          }
+        if (response.data) {
+          reset(response.data);
         }
-      } catch (err) {
-        Logger.error("Failed to load application", err);
+      } catch (error) {
+        console.error("Error fetching application:", error);
       } finally {
         setLoading(false);
       }
@@ -121,126 +89,165 @@ const ApplicationPage: React.FC = () => {
     fetchApplication();
   }, [user, reset]);
 
-  if (authLoading) return <LoadingScreen message="Checking Credentials..." />;
-  if (!user) return <Navigate to="/" replace />;
-  if (loading) return <LoadingScreen message="Fetching Application..." />;
-
-  const onFormSubmit = async (data: ApplicationData) => {
-    setSubmitError(null);
+  const onSubmit = async (data: ApplicationData) => {
+    if (!user) return;
+    setSubmitting(true);
     try {
       const token = localStorage.getItem("authToken");
-      await axios.post(`${API_URL}/api/application/me`, data, {
-        withCredentials: true,
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      await axios.post(`${import.meta.env.VITE_API_URL}/application`, data, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (user.role === "admin") {
-        const res = await axios.get(`${API_URL}/api/admin/my-apps`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        setAdminApps(res.data);
-        reset({
-          basicInfo: {
-            fullName: user.username,
-            email: "",
-            school: "",
-            year: "",
-            location: "",
-          },
-          skillsAndLinks: {
-            skills: [],
-            githubUrl: "",
-            portfolioUrl: "",
-            otherLinks: [],
-          },
-          accessibility: {
-            allergies: "",
-            dietaryRestrictions: "",
-            accommodations: "",
-          },
-        });
-        alert("Test Application Saved!");
-      } else {
-        alert("Application Saved!");
-        navigate("/app/rsvp", { replace: true });
-      }
-    } catch (err: any) {
-      Logger.error("Save failed", err);
-      const errorMsg =
-        err.response?.data?.message || "Failed to save application.";
-      const errorDetail = err.response?.data?.error || err.message;
-      setSubmitError({ message: errorMsg, details: errorDetail });
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      alert("Failed to submit application. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const copyErrorToClipboard = () => {
-    if (submitError) {
-      const text = `Error: ${submitError.message}\nDetails: ${JSON.stringify(submitError.details, null, 2)}`;
-      navigator.clipboard.writeText(text);
-      alert("Error details copied to clipboard!");
+  const handleNext = async () => {
+    let isValid = false;
+
+    // Validate current step fields before proceeding
+    if (currentStep === 0) {
+      isValid = await trigger("basicInfo");
+    } else if (currentStep === 1) {
+      isValid = await trigger("hackerExperience");
+    } else if (currentStep === 2) {
+      isValid = await trigger("work");
+    } else if (currentStep === 3) {
+      isValid = await trigger("additionalNeeds");
+    } else if (currentStep === 4) {
+      isValid = await trigger("diversity");
+      // Diversity is optional
+    } else if (currentStep === 5) {
+      isValid = await trigger("consent");
+    } else {
+      isValid = true;
+    }
+
+    if (isValid) {
+      if (currentStep === STEPS.length - 1) {
+        handleSubmit(onSubmit)();
+      } else {
+        setCurrentStep((prev) => prev + 1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep((prev) => prev - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  if (authLoading) return <LoadingScreen message="Checking Credentials..." />;
+  if (!user) return <Navigate to="/" replace />;
+  if (loading) return <LoadingScreen message="Fetching Application..." />;
+  if (submitting) return <LoadingScreen message="Submitting Application..." />;
+
+  const CurrentStepComponent = () => {
+    switch (currentStep) {
+      case 0:
+        return <StepAboutYou register={register} errors={errors} />;
+      case 1:
+        return (
+          <StepExperience
+            register={register}
+            errors={errors}
+            setValue={setValue}
+            watch={watch}
+          />
+        );
+      case 2:
+        return (
+          <StepWork register={register} errors={errors} setValue={setValue} />
+        );
+      case 3:
+        return (
+          <StepNeeds
+            register={register}
+            errors={errors}
+            watch={watch}
+            setValue={setValue}
+          />
+        );
+      case 4:
+        return (
+          <StepDiversity
+            register={register}
+            errors={errors}
+            setValue={setValue}
+            watch={watch}
+          />
+        );
+      case 5:
+        return <StepConsent register={register} errors={errors} />;
+      case 6:
+        return <StepReview formData={formData} />;
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex flex-col relative">
-      <Navbar />
-      <div className="flex-1 flex flex-col items-center p-4 pt-24 pb-12">
-        {submitError && (
-          <SubmissionErrorModal
-            error={submitError}
-            onClose={() => setSubmitError(null)}
-            onCopy={copyErrorToClipboard}
-          />
-        )}
+    <div className="min-h-screen bg-gray-950 text-white font-primary selection:bg-purple-500/30">
+      {/* Background Ambience */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-900/20 rounded-full blur-3xl opacity-30 animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-3xl opacity-30" />
+      </div>
 
-        {user.role === "admin" && <AdminTestAppsList apps={adminApps} />}
+      <div className="relative z-10 container mx-auto px-4 py-12 max-w-4xl">
+        {/* Header */}
+        <header className="mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-black mb-4 font-display tracking-tight">
+            Apply to{" "}
+            <span className="bg-clip-text text-transparent bg-linear-to-r from-purple-400 to-pink-400">
+              BearHacks 2026
+            </span>
+          </h1>
+          <p className="text-gray-400 max-w-lg mx-auto">
+            Complete the application below to reserve your spot. We can't wait
+            to see what you build!
+          </p>
+        </header>
 
-        <div className="bg-gray-800 p-8 rounded-2xl shadow-2xl max-w-4xl w-full border border-gray-700 relative overflow-hidden">
-          {isSubmitting && (
-            <div className="absolute inset-0 bg-gray-800/50 backdrop-blur-[2px] z-10 flex items-center justify-center">
-              <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          )}
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-bold">
-              {user.role === "admin"
-                ? "Create Test Application"
-                : "Hacker Application"}
-            </h2>
-            {!isSubmitting && (
-              <button
-                onClick={() => navigate("/app/rsvp")}
-                className="text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                Go to RSVP &rarr;
-              </button>
-            )}
-          </div>
+        {/* Wizard Container */}
+        <div className="bg-gray-900/40 backdrop-blur-xl border border-gray-800 rounded-3xl p-6 md:p-12 shadow-2xl relative overflow-hidden transition-all duration-500">
+          {/* Progress Bar */}
+          <WizardProgress currentStep={currentStep} totalSteps={STEPS.length} />
 
-          <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-10">
-            <BasicInfoSection register={register} errors={errors} />
-            <hr className="border-gray-700/50" />
-            <SkillsLinksSection
-              register={register}
-              errors={errors}
-              setValue={setValue}
-            />
-            <hr className="border-gray-700/50" />
-            <AccessibilitySection register={register} errors={errors} />
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full py-4 bg-linear-to-r from-purple-600 to-blue-600 rounded-lg font-bold text-lg hover:brightness-110 transition-all shadow-lg active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          {/* Step Content with Transitions */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="min-h-[400px]"
             >
-              {isSubmitting
-                ? "Processing..."
-                : user.role === "admin"
-                  ? "Create Test Record"
-                  : "Submit Application"}
-            </button>
-          </form>
+              <CurrentStepComponent />
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Navigation */}
+          <WizardNavigation
+            onBack={handleBack}
+            onNext={handleNext}
+            isFirstStep={currentStep === 0}
+            isLastStep={currentStep === STEPS.length - 1}
+            canProceed={true} // Logic handled in handleNext via trigger()
+          />
         </div>
+
+        <footer className="mt-12 text-center text-gray-600 text-sm">
+          &copy; 2026 BearHacks. All rights reserved.
+        </footer>
       </div>
     </div>
   );
