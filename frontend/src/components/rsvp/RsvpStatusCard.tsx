@@ -1,6 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  EntranceScale,
+  HoverSpring,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/motion/MotionComponents";
+import { FADE_IN_VARIANTS } from "@/styles/animations";
 
 interface RsvpStatusCardProps {
   status: {
@@ -15,15 +22,9 @@ const RsvpStatusCard: React.FC<RsvpStatusCardProps> = ({ status, onRsvp }) => {
   const navigate = useNavigate();
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9, y: 20 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      transition={{ type: "spring", stiffness: 100, damping: 15 }}
-      className="bg-gray-800 p-10 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] max-w-md w-full border border-gray-700 font-primary text-center flex flex-col items-center overflow-hidden"
-    >
+    <EntranceScale className="bg-gray-800 p-10 rounded-2xl shadow-[0_0_50px_rgba(0,0,0,0.5)] max-w-md w-full border border-gray-700 font-primary text-center flex flex-col items-center overflow-hidden">
       <motion.h1
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        variants={FADE_IN_VARIANTS}
         className="text-3xl font-black mb-8 bg-clip-text text-transparent bg-linear-to-r from-white to-gray-400 mx-auto"
       >
         RSVP Status
@@ -42,14 +43,14 @@ const RsvpStatusCard: React.FC<RsvpStatusCardProps> = ({ status, onRsvp }) => {
               <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl text-blue-300 font-medium text-sm md:text-base">
                 Looks like you haven't started your journey yet!
               </div>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate("/app/apply")}
-                className="px-8 py-4 bg-linear-to-r from-purple-600 to-blue-600 rounded-xl font-black text-lg shadow-xl w-full"
-              >
-                Apply Now &rarr;
-              </motion.button>
+              <HoverSpring>
+                <button
+                  onClick={() => navigate("/app/apply")}
+                  className="px-8 py-4 bg-linear-to-r from-purple-600 to-blue-600 rounded-xl font-black text-lg shadow-xl w-full"
+                >
+                  Apply Now &rarr;
+                </button>
+              </HoverSpring>
             </motion.div>
           )}
 
@@ -100,51 +101,48 @@ const RsvpStatusCard: React.FC<RsvpStatusCardProps> = ({ status, onRsvp }) => {
                   your spot.
                 </p>
               </div>
-              <motion.button
-                whileHover={{
-                  scale: 1.02,
-                  boxShadow: "0 0 20px rgba(34,197,94,0.4)",
-                }}
-                whileTap={{ scale: 0.98 }}
-                onClick={onRsvp}
-                className="w-full py-4 bg-linear-to-r from-green-600 to-green-500 rounded-2xl font-black text-white text-lg shadow-2xl border border-white/10"
-              >
-                CONFIRM ATTENDANCE
-              </motion.button>
+              <HoverSpring>
+                <button
+                  onClick={onRsvp}
+                  className="w-full py-4 bg-linear-to-r from-green-600 to-green-500 rounded-2xl font-black text-white text-lg shadow-2xl border border-white/10"
+                >
+                  CONFIRM ATTENDANCE
+                </button>
+              </HoverSpring>
             </motion.div>
           )}
 
           {status.rsvpd && (
-            <motion.div
+            <StaggerContainer
               key="rsvpd"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
               className="space-y-6 w-full flex flex-col items-center"
             >
-              <motion.div
-                className="relative inline-block"
-                whileHover={{ rotate: 5, scale: 1.1 }}
-              >
-                <div className="text-7xl mb-2">🎟️</div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full animate-ping"></div>
-              </motion.div>
-              <h2 className="text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-green-400 to-emerald-500">
+              <StaggerItem>
+                <HoverSpring
+                  className="relative inline-block"
+                  whileHover={{ rotate: 5, scale: 1.1 }}
+                >
+                  <div className="text-7xl mb-2">🎟️</div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full animate-ping"></div>
+                </HoverSpring>
+              </StaggerItem>
+              <StaggerItem className="text-3xl font-black text-transparent bg-clip-text bg-linear-to-r from-green-400 to-emerald-500">
                 See You There!
-              </h2>
-              <p className="text-gray-400 font-medium leading-relaxed">
+              </StaggerItem>
+              <StaggerItem className="text-gray-400 font-medium leading-relaxed">
                 Your spot is confirmed. Prepare for a weekend of innovation and
                 bears.
-              </p>
-              <div className="pt-6 border-t border-gray-700/50 w-full">
+              </StaggerItem>
+              <StaggerItem className="pt-6 border-t border-gray-700/50 w-full">
                 <p className="text-xs font-black text-gray-500 uppercase tracking-widest">
                   Check email for instructions
                 </p>
-              </div>
-            </motion.div>
+              </StaggerItem>
+            </StaggerContainer>
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+    </EntranceScale>
   );
 };
 

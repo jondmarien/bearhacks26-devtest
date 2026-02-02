@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { BREATHING_GLOW_VARIANTS } from "@/styles/animations";
 
 interface GlowBackgroundProps {
   color?: "purple" | "blue" | "red";
@@ -30,39 +31,17 @@ const GlowBackground: React.FC<GlowBackgroundProps> = ({
     >
       {showTop && (
         <motion.div
-          animate={
-            animate
-              ? {
-                  scale: [1, 1.2, 1],
-                  opacity: [0.3, 0.5, 0.3],
-                  x: [0, 20, 0],
-                }
-              : {}
-          }
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          variants={BREATHING_GLOW_VARIANTS}
+          custom={{ reverse: false }}
+          animate={animate ? "animate" : ""}
           className={`absolute top-1/4 left-1/4 w-[500px] h-[500px] ${glowColor} rounded-full blur-[120px]`}
         />
       )}
       {showBottom && (
         <motion.div
-          animate={
-            animate
-              ? {
-                  scale: [1.2, 1, 1.2],
-                  opacity: [0.3, 0.5, 0.3],
-                  x: [0, -20, 0],
-                }
-              : {}
-          }
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          variants={BREATHING_GLOW_VARIANTS}
+          custom={{ reverse: true }}
+          animate={animate ? "animate" : ""}
           className={`absolute bottom-1/4 right-1/4 w-[500px] h-[500px] ${glowColor} rounded-full blur-[120px]`}
         />
       )}
