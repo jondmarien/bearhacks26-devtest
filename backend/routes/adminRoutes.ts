@@ -17,6 +17,7 @@ router.get("/applications", async (req: Request, res: Response) => {
       "userId",
       "username email discordId avatar",
     );
+    console.log(`Admin fetched ${applications.length} applications`);
     res.json(applications);
   } catch (error) {
     console.error("Error fetching applications:", error);
@@ -35,6 +36,9 @@ router.post("/application/:id/status", async (req: Request, res: Response) => {
   }
 
   const accepted = status === "accepted";
+  console.log(
+    `Admin updating application ${id} to status: ${status} (accepted: ${accepted})`,
+  );
 
   try {
     const application = await Application.findByIdAndUpdate(
@@ -44,10 +48,12 @@ router.post("/application/:id/status", async (req: Request, res: Response) => {
     );
 
     if (!application) {
+      console.warn(`Admin update failed: Application ${id} not found`);
       res.status(404).json({ message: "Application not found" });
       return;
     }
 
+    console.log(`Application ${id} updated successfully`);
     res.json(application);
   } catch (error) {
     console.error("Error updating application:", error);
