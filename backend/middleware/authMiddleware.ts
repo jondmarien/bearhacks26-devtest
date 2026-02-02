@@ -10,7 +10,12 @@ const authMiddleware = (
   res: Response,
   next: NextFunction,
 ) => {
-  const token = req.cookies.token;
+  let token = req.cookies?.token;
+
+  // Check Authorization header (Bearer token)
+  if (!token && req.headers.authorization?.startsWith("Bearer ")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
 
   if (!token) {
     res.status(401).json({ message: "Not authenticated, no token" });

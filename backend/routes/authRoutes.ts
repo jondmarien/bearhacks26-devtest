@@ -36,9 +36,15 @@ router.get("/discord", (req: Request, res: Response) => {
   const state = Math.random().toString(36).substring(7); // Simple state for PoC
   // In production, store state in cookie/session to verify later
 
-  const url = `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(
-    DISCORD_REDIRECT_URI!,
-  )}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}`;
+  const params = new URLSearchParams({
+    client_id: DISCORD_CLIENT_ID!,
+    redirect_uri: DISCORD_REDIRECT_URI!,
+    response_type: "code",
+    scope: scope,
+    state: state,
+  });
+
+  const url = `https://discord.com/api/oauth2/authorize?${params.toString()}`;
 
   res.redirect(url);
 });
@@ -118,9 +124,8 @@ router.get("/discord/callback", async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    // Redirect to frontend app
-    // In dev, frontend is on 5173. usage of env var is correct.
-    res.redirect(`${process.env.FRONTEND_URL}/app/apply`);
+    // Redirect to frontend app with Token in parameter (for Bearer auth fallback)
+    res.redirect(`${process.env.FRONTEND_URL}/app/apply?token=${token}`);
   } catch (error) {
     console.error("Auth Error:", error);
     res.status(500).send("Internal Server Error");
