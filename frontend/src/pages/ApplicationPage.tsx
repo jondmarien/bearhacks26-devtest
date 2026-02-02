@@ -85,7 +85,7 @@ const ApplicationPage: React.FC = () => {
         headers: token ? { Authorization: `Bearer ${token}` } : {}, // Send token
       });
       alert("Application Saved!");
-      navigate("/app/rsvp");
+      navigate("/app/rsvp", { replace: true });
     } catch (err) {
       console.error("Save failed", err);
       alert("Failed to save application.");
