@@ -1,50 +1,69 @@
 # BearHacks 2026 - Backend
 
-The central API for BearHacks 2026, dealing with Authentication, User Data, and Applications.
+The backend API for BearHacks 2026, built with Express and Bun.
 
-## 🛠️ Stack
+## ⚙️ Setup
 
--   **Bun** (Runtime)
--   **Express.js** (Web Framework)
--   **Mongoose** (MongoDB ODM)
--   **JSONWebToken** (Session Management)
-
-## ⚙️ Configuration
-
-Create a `.env` file in this directory with the following variables:
-
-```env
-PORT=5000
-MONGODB_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/BearHacks26?retryWrites=true&w=majority
-FRONTEND_URL=http://localhost:5173
-
-# Auth Secrets
-JWT_SECRET=your_super_secret_key
-
-# Discord OAuth
-DISCORD_CLIENT_ID=...
-DISCORD_CLIENT_SECRET=...
-DISCORD_REDIRECT_URI=http://localhost:5000/auth/discord/callback
-DISCORD_GUILD_ID=...
-DISCORD_BOT_TOKEN=...
-```
-
-## 🏃 Run Locally
-
-1.  **Install Dependencies:**
+1.  **Install Dependencies**
     ```bash
     bun install
     ```
 
-2.  **Start Dev Server:**
+2.  **Environment Variables**
+    Create a `.env` file in this directory:
+    ```env
+    PORT=5000
+    MONGO_URI=mongodb+srv://...
+    FRONTEND_URL=http://localhost:5173
+    
+    # Discord OAuth
+    DISCORD_CLIENT_ID=...
+    DISCORD_CLIENT_SECRET=...
+    DISCORD_REDIRECT_URI=http://localhost:5000/auth/discord/callback
+    
+    # Security
+    JWT_SECRET=your_super_secret_key
+    NODE_ENV=development
+    ```
+
+3.  **Run Development Server**
     ```bash
     bun run dev
     ```
-    Server runs on `http://localhost:5000`.
 
-## 📡 Key Endpoints
+## 🔐 Admin Access
 
--   `GET /auth/discord`: Initiates Discord OAuth login.
--   `GET /auth/me`: Checks current session status.
--   `POST /api/application/me`: Submit/Update user application.
--   `GET /api/rsvp/me`: Get RSVP status.
+A default admin account is seeded automatically on startup if it doesn't exist.
+
+-   **Username**: `admin`
+-   **Password**: `[PASSWORD]`
+-   **Endpoint**: `POST /auth/login`
+
+## 📡 API Endpoints
+
+### Authentication (`/auth`)
+-   `GET /auth/discord`: Initiate Discord OAuth flow.
+-   `GET /auth/discord/callback`: OAuth callback (Cookies + Redirect).
+-   `POST /auth/login`: Admin password login.
+-   `GET /auth/logout`: clear session.
+-   `GET /auth/me`: Check current session.
+
+### Application (`/api/application`)
+-   `GET /me`: Get current user's application.
+-   `POST /me`: Create or Update application.
+
+### RSVP (`/api/rsvp`)
+-   `GET /me`: Get RSVP status (hasApplication, accepted, rsvpd).
+-   `POST /`: Confirm RSVP (only if accepted).
+
+### Admin (`/api/admin`) - *Protected*
+-   `GET /applications`: List all applications with user info.
+-   `POST /application/:id/status`: Update status (`accepted` | `rejected`).
+
+## 📝 Logging
+
+The backend implements comprehensive logging:
+-   **Global**: All requests are logged with Method/URL/Timestamp.
+-   **Auth**: Success/Failure logs for Discord and Admin login.
+-   **App/RSVP**: Logs for application submissions and RSVP confirmations.
+-   **Admin**: Logs for fetching lists and updating applicant status.

@@ -1,48 +1,48 @@
 # BearHacks 2026 PoC
 
-This is the repository for the BearHacks 2026 Hackathon platform. It is a monorepo structure containing a **Vite + React** frontend and a **Node.js (Express)** backend.
+This repository contains the Proof of Concept (PoC) for the BearHacks 2026 application system. It is structured as a monorepo containing a separate Frontend (Vite + React) and Backend (Express + Bun).
 
-## 🏗️ Tech Stack
+## 🏗️ Structure
 
--   **Frontend:** React, Vite, TypeScript, TailwindCSS v4
--   **Backend:** Node.js (via Bun), Express, Mongoose
--   **Database:** MongoDB Atlas
--   **Authentication:** Discord OAuth2 (HttpOnly Cookies)
+- **`frontend/`**: React application using Vite, TypeScript, and TailwindCSS.
+- **`backend/`**: Express API using Bun, Mongoose (MongoDB), and JWT Authentication.
 
 ## 🚀 Quick Start
 
-Ensure you have [Bun](https://bun.sh/) installed.
+To run both the frontend and backend concurrently (requires Bun):
 
-1.  **Install Dependencies:**
-    ```bash
-    bun install
-    bun install:all # Installs dependencies for root, frontend, and backend
-    ```
+```bash
+# Install dependencies for both
+cd backend && bun install
+cd ../frontend && bun install
+cd ..
 
-    *Note: If `bun install:all` isn't defined yet, simply run `bun install` in root, frontend, and backend folders manually, or rely on `bun install` at root if using workspaces.*
+# Run both in parallel
+bun run dev
+```
 
-    **Recommended manual install for first run:**
-    ```bash
-    bun install
-    cd frontend && bun install
-    cd ../backend && bun install
-    cd ..
-    ```
+- **Frontend**: http://localhost:5173
+- **Backend**: http://localhost:5000
 
-2.  **Environment Setup:**
-    -   Ensure `backend/.env` is populated with `MONGODB_URI`, `DISCORD_CLIENT_ID`, etc.
-    -   Ensure `DISCORD_REDIRECT_URI` is set to `http://localhost:5000/auth/discord/callback` (or your production URL).
+## 🌐 Deployments
 
-3.  **Run Development Server:**
-    Run both frontend and backend concurrently:
-    ```bash
-    bun run dev
-    ```
+- **Frontend (Vercel)**: https://bearhacks26-devtest.vercel.app
+- **Backend (Render)**: https://bearhacks26-devtest.onrender.com
 
-    -   **Frontend:** [http://localhost:5173](http://localhost:5173)
-    -   **Backend:** [http://localhost:5000](http://localhost:5000)
+## ✨ Features
 
-## 📂 Structure
+- **Discord Authentication**: Secure OAuth2 login with HTTP-Only cookies.
+- **Hacker Application**: Multi-step form with auto-save/update.
+- **RSVP System**: Status tracking (Pending -> Accepted -> Confirmed).
+- **Admin Panel**: Dashboard for organizers to review and accept applications.
+    - **Login**: `/admin`
+    - **Default User**: `admin`
+    - **Default Pass**: `bearhacks2026@admin`
+- **Logging**: Comprehensive logging for all requests and critical actions.
 
--   `frontend/`: Source code for the User Interface.
--   `backend/`: Source code for the API and Database logic.
+## 🛠️ Technology Stack
+
+- **Runtime**: Bun (Fast JavaScript runtime)
+- **Frontend**: React, Vite, TailwindCSS v4
+- **Backend**: Express.js, MongoDB Atlas (Mongoose)
+- **Security**: `bcryptjs`, `jsonwebtoken`, `cors` (SameSite=None)
