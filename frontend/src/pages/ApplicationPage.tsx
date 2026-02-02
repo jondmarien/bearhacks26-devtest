@@ -100,7 +100,7 @@ const ApplicationPage = () => {
       await axios.post(`${API_URL}/api/application`, data, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      navigate("/dashboard");
+      navigate("/app/rsvp");
     } catch (error) {
       console.error("Error submitting application:", error);
       alert("Failed to submit application. Please try again.");
