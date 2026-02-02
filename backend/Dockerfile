@@ -6,7 +6,7 @@ WORKDIR /app
 COPY shared /shared
 
 # Copy backend package files
-COPY backend/bun.lock ./
+COPY backend/package.json backend/bun.lock ./
 
 # Install dependencies
 RUN bun install --production
