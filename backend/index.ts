@@ -9,12 +9,18 @@ import adminRoutes from "@/routes/adminRoutes";
 import authRoutes from "@/routes/authRoutes";
 import appRoutes from "@/routes/appRoutes";
 
+import path from "path";
+import { fileURLToPath } from "url";
+
 dotenv.config();
 
 const app = express();
 app.set("trust proxy", 1); // Trust Render's proxy for secure cookies
 
 const PORT = process.env.PORT || 5000;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware
 app.use(
@@ -34,9 +40,16 @@ connectDB().then(() => {
   seedAdmin();
 });
 
-// Routes
-app.get("/", (req, res) => {
-  res.send("BearHacks 2026 API is running!");
+// Serve Frontend Static Files
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+// Catch-all for SPA
+app.get("*", (req, res) => {
+  if (req.path.startsWith("/api") || req.path.startsWith("/auth")) {
+    res.status(404).json({ message: "API endpoint not found" });
+    return;
+  }
+  res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
 });
 
 app.use("/auth", authRoutes);
