@@ -43,7 +43,8 @@ const LandingPage: React.FC = () => {
             <motion.span
               variants={FLOATING_VARIANTS}
               animate="animate"
-              className="inline-block"
+              className="inline-block will-change-transform"
+              style={{ backfaceVisibility: "hidden" }}
             >
               BearHacks <br /> 2026
             </motion.span>

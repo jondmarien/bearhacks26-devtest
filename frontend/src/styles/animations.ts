@@ -57,11 +57,11 @@ export const STAGGER_CONTAINER_VARIANTS: Variants = {
 
 export const FLOATING_VARIANTS: Variants = {
   animate: {
-    y: [0, -10, 0],
+    y: [0, -12, 0],
     transition: {
-      duration: 4,
+      duration: 6, // Slower is smoother
       repeat: Infinity,
-      ease: "easeInOut",
+      ease: [0.45, 0, 0.55, 1], // Custom sine-like curve
     },
   },
 };
