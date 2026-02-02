@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Logger from "@/utils/Logger";
 
@@ -38,6 +38,7 @@ interface TestApplication {
 
 const AdminDashboard: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"hackers" | "test">("hackers");
   const [applications, setApplications] = useState<Application[]>([]);
   const [testApps, setTestApps] = useState<TestApplication[]>([]);
@@ -66,10 +67,31 @@ const AdminDashboard: React.FC = () => {
   };
 
   useEffect(() => {
+    const checkAdminSession = () => {
+      const timestamp = localStorage.getItem("adminAuthTimestamp");
+      if (!timestamp) {
+        Logger.warn("No admin session timestamp found, redirecting to login");
+        navigate("/admin", { replace: true });
+        return;
+      }
+
+      const diff = Date.now() - parseInt(timestamp);
+      if (diff > 30 * 60 * 1000) {
+        Logger.warn("Admin session timed out (30m), forcing re-login");
+        localStorage.removeItem("adminAuthTimestamp");
+        navigate("/admin", { replace: true });
+      } else {
+        Logger.debug(
+          `Admin session active: ${Math.round((30 * 60 * 1000 - diff) / 60000)} minutes remaining`,
+        );
+      }
+    };
+
     if (user?.role === "admin") {
+      checkAdminSession();
       fetchData();
     }
-  }, [user]);
+  }, [user, navigate]);
 
   const updateStatus = async (
     id: string,

@@ -30,12 +30,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const checkAuth = async () => {
     try {
-      // 1. Check URL for token (first login)
       const params = new URLSearchParams(window.location.search);
       const urlToken = params.get("token");
       if (urlToken) {
         localStorage.setItem("authToken", urlToken);
-        // Clean URL
         window.history.replaceState(
           {},
           document.title,
@@ -43,25 +41,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         );
       }
 
-      // 2. Get token from storage
       const token = localStorage.getItem("authToken");
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
 
       Logger.debug(`Checking auth status... ${API_URL}/auth/me`);
       const res = await axios.get(`${API_URL}/auth/me`, {
         withCredentials: true,
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers: { Authorization: `Bearer ${token}` },
       });
+
       Logger.debug("Auth response:", res.data);
       if (res.data.authenticated) {
         setUser(res.data.user);
       } else {
         setUser(null);
+        Logger.warn("Auth check: Not authenticated, clearing token");
         localStorage.removeItem("authToken");
+        localStorage.removeItem("adminAuthTimestamp");
       }
     } catch (error) {
       Logger.error("Auth check failed:", error);
       setUser(null);
-      // Optional: don't clear default, but if 401, maybe clear?
     } finally {
       setLoading(false);
     }
@@ -84,6 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       );
       const { token, user } = res.data;
       localStorage.setItem("authToken", token);
+      localStorage.setItem("adminAuthTimestamp", Date.now().toString());
       setUser(user);
     } catch (error) {
       Logger.error("Login failed", error);
@@ -96,6 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       await axios.get(`${API_URL}/auth/logout`, { withCredentials: true });
       setUser(null);
       localStorage.removeItem("authToken");
+      localStorage.removeItem("adminAuthTimestamp");
       window.location.href = "/";
     } catch (error) {
       Logger.error("Logout failed", error);

@@ -2,13 +2,27 @@ import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
+import Logger from "@/utils/Logger";
 
 const AdminLoginPage: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { loginWithPassword } = useAuth();
+  const { user, loginWithPassword } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");
+
+  React.useEffect(() => {
+    const timestamp = localStorage.getItem("adminAuthTimestamp");
+    if (user?.role === "admin" && timestamp) {
+      const diff = Date.now() - parseInt(timestamp);
+      if (diff < 30 * 60 * 1000) {
+        Logger.info("Admin session valid, auto-redirecting to dashboard");
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        Logger.warn("Admin session expired or invalid timestamp");
+      }
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
