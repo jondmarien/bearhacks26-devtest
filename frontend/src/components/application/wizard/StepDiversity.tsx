@@ -158,28 +158,6 @@ const StepDiversity: React.FC<StepProps> = ({
           </div>
         </div>
       </div>
-      {/* Decorative Mascot */}
-      <motion.div
-        className="absolute -right-5 bottom-40 pointer-events-none hidden md:block"
-        animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-      >
-        {/* Blue Star-like Mascot */}
-        <svg width="120" height="120" viewBox="0 0 100 100" fill="none">
-          <path
-            d="M50 0L60 35L95 35L65 55L75 90L50 70L25 90L35 55L5 35L40 35L50 0Z"
-            fill="#3B82F6"
-          />
-          <path
-            d="M40 45Q50 55 60 45"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <circle cx="42" cy="40" r="2" fill="white" />
-          <circle cx="58" cy="40" r="2" fill="white" />
-        </svg>
-      </motion.div>
     </div>
   );
 };
